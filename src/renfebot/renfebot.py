@@ -1,16 +1,16 @@
 #!/usr/local/bin/python3
 
-from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove)
-from telegram.ext import (Updater, CommandHandler, MessageHandler,
-                          Filters, RegexHandler, ConversationHandler)
-from telegram.ext import CallbackQueryHandler
-from telegram.parsemode import ParseMode
-
 import datetime
 from enum import Enum
 import logging
 
 import argparse
+
+from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove)
+from telegram.ext import (Updater, CommandHandler, MessageHandler,
+                          Filters, RegexHandler, ConversationHandler)
+from telegram.ext import CallbackQueryHandler
+from telegram.parsemode import ParseMode
 
 import renfechecker2 as RENFECHECKER
 import dbmanager as renfebotdb
@@ -23,12 +23,6 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
                     level=logging.DEBUG)
 
 logger = logging.getLogger(__name__)
-
-
-
-
-
-
 
 
 class RenfeBot:

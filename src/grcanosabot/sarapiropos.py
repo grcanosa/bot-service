@@ -1,7 +1,8 @@
 #/!usr/bin/python3
 
-from basebot.handlers.phraselist import PhraseList;
-from basebot.tokens import CID_SARA
+from basebot.handlers.phraselist import PhraseList
+
+from secret import CID_SARA
 
 
 class SaraPiropoList(PhraseList):

@@ -3,15 +3,15 @@
 import os
 import logging
 import datetime
-from basebot.tokens import TOKEN_GRCANOSABOT,CID_GRCANOSA,CID_SARA
+
 from basebot.basebot import BaseBot
 from basebot.handlers.fixedresponse import FixedResponse
 from basebot.handlers.phraselist import PhraseList
 from basebot.handlers.piropos import PiropoList
 
 
-from grcanosabot.sarapiropos import SaraPiropoList
-
+from sarapiropos import SaraPiropoList
+from secret import TOKEN_GRCANOSABOT,CID_GRCANOSA,CID_SARA
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.DEBUG)
