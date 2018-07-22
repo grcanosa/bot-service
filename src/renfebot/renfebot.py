@@ -16,7 +16,7 @@ import renfechecker2 as RENFECHECKER
 import dbmanager as renfebotdb
 from texts import texts as TEXTS
 from texts import keyboards as KEYBOARDS
-from bot_data import TOKEN, ADMIN_ID
+from secret import TOKEN, ADMIN_ID
 from conversations import ConvStates, RenfeBotConversations
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',

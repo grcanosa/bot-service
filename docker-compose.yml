@@ -3,3 +3,27 @@ services:
   container_raspberry:
     build: ./containers/raspberry-strech/
     image: raspberry_bot:latest
+  #BOTS GO HERE
+  grcanosabot:
+    image: raspberry_bot:latest
+    restart: always
+    container_name: grcanosabot
+    network_mode: host
+    volumes:
+      - "./shared/:/mnt/shared/"
+      - "./src/:/code/" 
+    entrypoint:
+      - python3
+      - grcanosabot/grcanosabot.py
+  renfebot:
+    image: raspberry_bot:latest
+    restart: always
+    container_name: renfebot
+    network_mode: host
+    volumes:
+      - "./shared/:/mnt/shared/"
+      - "./src/:/code/"
+      - "./submodules/:/submodules/" 
+    entrypoint:
+      - python3
+      - renfebot/renfebot.py

@@ -1,0 +1,3 @@
+[submodule "submodules/telegram-calendar-keyboard"]
+	path = submodules/telegram-calendar-keyboard
+	url = https://github.com/grcanosa/telegram-calendar-keyboard.git

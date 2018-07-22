@@ -17,4 +17,4 @@ RUN wget https://github.com/mozilla/geckodriver/releases/download/v0.19.1/geckod
 ENV TZ=Europe/Madrid
 
 WORKDIR /code
-ENV PYTHONPATH "${PYTONPATH}:/code/"
+ENV PYTHONPATH "${PYTONPATH}:/code/:/submodules/"

@@ -7,8 +7,8 @@ import logging
 from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove)
 from telegram.ext import ConversationHandler
 
-from telegramcalendarkeyboard import telegramcalendar
-from telegramcalendarkeyboard import telegramoptions
+from telegram-calendar-keyboard import telegramcalendar
+from telegram-calendar-keyboard import telegramoptions
 
 from texts import texts as TEXTS
 from texts import keyboards as KEYBOARDS
