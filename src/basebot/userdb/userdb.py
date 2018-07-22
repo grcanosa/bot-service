@@ -12,6 +12,9 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 
+DBFILE = None
+
+
 def get_username(first_name, last_name, username):
     def addifnotnone(x): return x + " " if x is not None else ""
     full_username = ""
@@ -39,6 +42,8 @@ def initdb(dbpath):
         conn.commit()
         cur.close()
         conn.close()
+    global DBFILE
+    DBFILE = dbpath
 
 def dict_factory(cursor, row):
     d = {}
