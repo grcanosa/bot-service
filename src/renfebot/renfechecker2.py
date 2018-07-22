@@ -106,7 +106,7 @@ def with_new_driver(fun):
                 ret = fun(driver, *arg, **kw)
             except Exception as e:
                 logger.error("Exception: "+str(e))
-            input("Press the <ENTER> key to continue...")
+            #input("Press the <ENTER> key to continue...")
             driver.close()
             return ret
     return wrapper

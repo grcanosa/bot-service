@@ -10,6 +10,7 @@ from telegram.ext import ConversationHandler
 from telegramcalendarkeyboard import telegramcalendar
 from telegramcalendarkeyboard import telegramoptions
 
+from basebot.userdb import userdb
 from texts import texts as TEXTS
 from texts import keyboards as KEYBOARDS
 
@@ -85,13 +86,21 @@ class RenfeBotConversations:
     def handler_option(self, bot, update):
         userid = update.message.from_user.id
         ret_code = 0
+        full_username = userdb.get_username(update.message.from_user.first_name
+                , update.message.from_user.last_name
+                , update.message.from_user.username)
+        userdb.add_user( update.message.from_user.id, full_username)
         if update.message.text == TEXTS["MAIN_OP_DO_QUERY"]:
+            userdb.add_cmd( update.message.from_user.id, "consultaahora")
             ret_code = self._h_op_do_query(userid, bot, update)
         elif update.message.text == TEXTS["MAIN_OP_ADD_QUERY"]:
+            userdb.add_cmd( update.message.from_user.id, "consultaperiodica")
             ret_code = self._h_op_add_query(userid, bot, update)
         elif update.message.text == TEXTS["MAIN_OP_DEL_QUERY"]:
+            userdb.add_cmd( update.message.from_user.id, "borrarconsulta")
             ret_code = self._h_op_del_query(userid, bot, update)
         elif update.message.text == TEXTS["MAIN_OP_CHECK_QUERY"]:
+            userdb.add_cmd( update.message.from_user.id, "verconsulta")
             ret_code = self._h_op_check_queries(userid, bot, update)
         else:
             update.message.reply_text(TEXTS["MAIN_OP_UNKNOWN"])

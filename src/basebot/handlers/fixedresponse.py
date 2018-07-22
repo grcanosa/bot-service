@@ -19,6 +19,7 @@ class FixedResponse:
         self._response = response
         self._type = phrasetype
         self._dbfile = dbfile
+        userdb.initdb(self._dbfile)
         self._up = updater
         self._priority = priority
         logger.debug("Creating fixed reponse for cmd: "+self._cmd)
@@ -34,8 +35,8 @@ class FixedResponse:
             full_username = userdb.get_username(update.message.from_user.first_name
                             , update.message.from_user.last_name
                             , update.message.from_user.username)
-            userdb.add_user(self._dbfile, update.message.from_user.id, full_username)
-            userdb.add_cmd(self._dbfile, update.message.from_user.id, self._cmd)
+            userdb.add_user( update.message.from_user.id, full_username)
+            userdb.add_cmd( update.message.from_user.id, self._cmd)
         if self._type == "message":
             bot.send_message(chat_id=update.message.chat_id,text=self._response)
         elif self._type == "gif":

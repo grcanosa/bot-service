@@ -18,6 +18,7 @@ class PhraseList:
         self._filename = filename
         self._type = phrasetype
         self._dbfile = dbfile
+        userdb.initdb(self._dbfile)
         self._up = updater
         self._priority = priority
         logger.debug("Creating phrase list for get: "+self._cmdget+" and add: "+self._cmdadd)
@@ -67,11 +68,11 @@ class PhraseList:
             full_username = userdb.get_username(update.message.from_user.first_name
                             , update.message.from_user.last_name
                             , update.message.from_user.username)
-            userdb.add_user(self._dbfile, update.message.from_user.id, full_username)
-            userdb.add_cmd(self._dbfile, update.message.from_user.id, self._cmdget)
+            userdb.add_user( update.message.from_user.id, full_username)
+            userdb.add_cmd( update.message.from_user.id, self._cmdget)
         #msgspli = update.message.text.split()
         logger.debug("Giving something to own user")
-        if userdb.get_cmd_num(self._dbfile,update.message.from_user.id,self._cmdget) % 3 != 0:
+        if userdb.get_cmd_num(update.message.from_user.id,self._cmdget) % 3 != 0:
             self.send_random(bot,update.message.chat_id)
         else:
             text, phrasetype = self.get_max_cmd_response(update)

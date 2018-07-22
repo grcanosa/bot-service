@@ -3,7 +3,7 @@
 import datetime
 from enum import Enum
 import logging
-
+import os
 import argparse
 
 from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove)
@@ -11,6 +11,8 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler,
                           Filters, RegexHandler, ConversationHandler)
 from telegram.ext import CallbackQueryHandler
 from telegram.parsemode import ParseMode
+
+from basebot.userdb import userdb
 
 import renfechecker2 as RENFECHECKER
 import dbmanager as renfebotdb
@@ -26,14 +28,17 @@ logger = logging.getLogger(__name__)
 
 
 class RenfeBot:
-    def __init__(self, token, admin_id, database):
+    def __init__(self, token, admin_id, dbpath):
         self._token = token
         self._admin_id = admin_id
         self._updater = Updater(token)
         self._jobQ = self._updater.job_queue
         self._CV = RenfeBotConversations(self)
         #self._RF = renfechecker.RenfeChecker()
-        self._DB = renfebotdb.RenfeBotDB(database)
+        self._dbfile = os.path.join(dbpath,"renfebot.db")
+        self._userdbfile = os.path.join(dbpath,"renfebot.users.db")
+        self._DB = renfebotdb.RenfeBotDB(self._dbfile)
+        userdb.initdb(self._userdbfile)
         self._install_handlers()
 
 
@@ -197,13 +202,13 @@ class RenfeBot:
 
 def parse_arguments():
     parser = argparse.ArgumentParser("RenfeBot: check renfe web for tickets")
-    parser.add_argument("--database","-d",help="Database location",dest="database",default="/mnt/shared/renfebot.db")
+    parser.add_argument("--dbpath","-d",help="Database location",dest="dbpath",default="/mnt/shared")
     args = parser.parse_args()
     return args
 
 
 if __name__ == "__main__":
     args = parse_arguments()
-    rb = RenfeBot(TOKEN, ADMIN_ID,args.database)
+    rb = RenfeBot(TOKEN, ADMIN_ID,args.dbpath)
     rb.start()
     rb.idle()

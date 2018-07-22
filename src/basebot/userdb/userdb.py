@@ -24,26 +24,32 @@ def get_username(first_name, last_name, username):
     return username
 
 
-def initdb(dbpath):
-    if not os.path.isfile(dbpath):
-        conn = sqlite3.connect(dbpath)
-        cur = conn.cursor()
-        cur.execute(""" CREATE TABLE users (
-                                        userid INTEGER PRIMARY KEY,
-                                        username TEXT
-                                        ) """)
-        cur.execute(""" CREATE TABLE actions (
-                                    userid INTEGER,
-                                    cmd TEXT,
-                                    num_uses INTEGER,
-                                    FOREIGN KEY(userid) REFERENCES users(userid),
-                                    PRIMARY KEY (userid, cmd)
-                                              ) """)                                            
-        conn.commit()
-        cur.close()
-        conn.close()
+def initdb(dbpath = None):
     global DBFILE
-    DBFILE = dbpath
+    if dbpath is not None and DBFILE is None:
+        if not os.path.isfile(dbpath):
+            conn = sqlite3.connect(dbpath)
+            cur = conn.cursor()
+            cur.execute(""" CREATE TABLE users (
+                                            userid INTEGER PRIMARY KEY,
+                                            username TEXT
+                                            ) """)
+            cur.execute(""" CREATE TABLE actions (
+                                        userid INTEGER,
+                                        cmd TEXT,
+                                        num_uses INTEGER,
+                                        FOREIGN KEY(userid) REFERENCES users(userid),
+                                        PRIMARY KEY (userid, cmd)
+                                                ) """)                                            
+            conn.commit()
+            cur.close()
+            conn.close()
+        DBFILE = dbpath
+        return True
+    elif DBFILE is None:
+        return False
+    else:
+        return True
 
 def dict_factory(cursor, row):
     d = {}
@@ -53,9 +59,10 @@ def dict_factory(cursor, row):
 
 
 def _openclose(foo):
-    def wrapper(dbpath, *args, **kw):
-        initdb(dbpath)
-        conn = sqlite3.connect(dbpath)
+    def wrapper(*args, **kw):
+        global DBFILE
+        initdb(DBFILE)
+        conn = sqlite3.connect(DBFILE)
         conn.row_factory = dict_factory
         cur = conn.cursor()
         ret = foo(conn,cur,*args, **kw)
