@@ -11,19 +11,22 @@ services:
     network_mode: host
     volumes:
       - "./shared/:/mnt/shared/"
+      - "./data/:/mnt/data/"
       - "./src/:/code/" 
     entrypoint:
       - python3
       - grcanosabot/grcanosabot.py
-  # renfebot:
-  #   image: raspberry_bot:latest
-  #   restart: always
-  #   container_name: botsrv_renfebot
-  #   network_mode: host
-  #   volumes:
-  #     - "./shared/:/mnt/shared/"
-  #     - "./src/:/code/"
-  #     - "./submodules/:/submodules/" 
-  #   entrypoint:
-  #     - python3
-  #     - renfebot/renfebot.py
+      - --dataloc=/mnt/data/
+      - --dbloc=/mnt/shared
+  renfebot:
+    image: raspberry_bot:latest
+    restart: always
+    container_name: botsrv_renfebot
+    network_mode: host
+    volumes:
+      - "./shared/:/mnt/shared/"
+      - "./src/:/code/"
+      - "./submodules/:/submodules/" 
+    entrypoint:
+      - python3
+      - renfebot/renfebot.py

@@ -3,6 +3,7 @@
 import os
 import logging
 import datetime
+import argparse
 
 from basebot.basebot import BaseBot
 from basebot.handlers.fixedresponse import FixedResponse
@@ -78,17 +79,20 @@ class GrcanosaBot(BaseBot):
 
 
 
-def main(*args, **kw):
-    logger.info("TESTING")
-    n = GrcanosaBot("/mnt/shared/","/mnt/shared/data/")
+def main(dbloc,dataloc):
+    #logger.info("TESTING")
+    n = GrcanosaBot(dbloc,dataloc)
     n.start()
     n.idle()
 
 
 def parse_arguments():
-    return None
-
+    parser = argparse.ArgumentParser("Grcanosabot")
+    parser.add_argument("--dataloc",help="Data location",dest="dataloc",default="/mnt/data/")
+    parser.add_argument("--dbloc",help="Data location",dest="dbloc",default="/mnt/shared/")
+    args = parser.parse_args()
+    return args
 
 if __name__ == "__main__":
     args = parse_arguments()
-    main()
+    main(args.dbloc,args.dataloc)
