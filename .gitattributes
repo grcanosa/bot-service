@@ -1,2 +1,3 @@
 #pattern  filter=crypt diff=crypt
 src/grcanosabot/secret.py filter=crypt diff=crypt
+src/renfebot/secret.py filter=crypt diff=crypt
