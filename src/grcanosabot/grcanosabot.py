@@ -79,6 +79,16 @@ class GrcanosaBot(BaseBot):
 
 
 def main(*args, **kw):
-    n = GrcanosaBot("/mnt/shared/","/data/")
+    logger.info("TESTING")
+    n = GrcanosaBot("/mnt/shared/","/mnt/shared/data/")
     n.start()
     n.idle()
+
+
+def parse_arguments():
+    return None
+
+
+if __name__ == "__main__":
+    args = parse_arguments()
+    main()
