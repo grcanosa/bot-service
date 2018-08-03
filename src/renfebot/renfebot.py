@@ -60,12 +60,13 @@ class RenfeBot:
             msg = ""
             for  train in trenes:
                 logger.info(train)
+                cost_str = "{cost:.2f}".format(cost=train["PRECIO"])
                 msg += TEXTS["TRAIN_INFO"].format(
                                      t_departure=train["SALIDA"].strftime(
                                          "%H:%M"),
                                      t_arrival=train["LLEGADA"].strftime("%H:%M"),
-                                     cost=train["PRECIO"] if train["PRECIO"] > 50 else "*" +
-                                     str(train["PRECIO"]) + "*",
+                                     cost=cost_str if train["PRECIO"] > 50 else "*" +
+                                            cost_str + "*",
                                      ticket_type=train["TARIFA"]
                                  )
                 msg += "\n"

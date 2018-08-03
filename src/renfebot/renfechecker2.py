@@ -70,9 +70,9 @@ def are_if_trains_available(driver):
 def getTrains(driver):
     trayectos = []
     trenes = driver.find_element_by_id("listaTrenesTBodyIda")
-    rows = trenes.find_elements_by_xpath(".//tr[@class='trayectoRow']")
-    rows = rows + trenes.find_elements_by_xpath(".//tr[@class='trayectoRow row_alt']")
-    rows = rows + trenes.find_elements_by_xpath(".//tr[@class='trayectoRow last']")
+    rows = trenes.find_elements_by_xpath(".//tr[contains(@class,'trayectoRow')]")
+    # rows = rows + trenes.find_elements_by_xpath(".//tr[@class='trayectoRow row_alt']")
+    # rows = rows + trenes.find_elements_by_xpath(".//tr[@class='trayectoRow last']")
     for r in rows:
         sal = r.find_element_by_xpath(".//td[@headers='colSalida']").text
         lle = r.find_element_by_xpath(".//td[@headers='colLlegada']").text
@@ -88,8 +88,8 @@ def getTrains(driver):
         if disp:
             precio = r.find_element_by_xpath(".//td[@headers='colPrecio']").text
             precio = float(precio.split()[0].replace(",","."))
-            clase = r.find_element_by_xpath(".//td[@headers='colClase']").text
-            tarifa = r.find_element_by_xpath(".//td[@headers='colTarifa']").text
+            clase = r.find_element_by_xpath(".//td[@headers='colClase']//span").get_attribute("innerHTML")
+            tarifa = r.find_element_by_xpath(".//td[@headers='colTarifa']//span").get_attribute("innerHTML")
         trayectos.append({"SALIDA":salT,"LLEGADA":lleT,"TIPO":tipo,"PRECIO":precio,"DURACION":float(dur)/3600,"CLASE":clase,"TARIFA":tarifa,"DISPONIBLE":disp})
     logger.debug("Returning arrary")
     return trayectos
