@@ -3,6 +3,9 @@ services:
   container_raspberry:
     build: ./containers/raspberry-strech/
     image: raspberry_bot:latest
+  container_raspberry_alpine:
+    build: ./containers/raspberry-alpine/
+    image: raspberry_bot_alpine:latest
   #BOTS GO HERE
   grcanosabot:
     image: raspberry_bot:latest
@@ -19,7 +22,7 @@ services:
       - --dataloc=/mnt/data/
       - --dbloc=/mnt/shared
   renfebot:
-    image: raspberry_bot:latest
+    image: raspberry_bot_alpine:latest
     restart: always
     container_name: botsrv_renfebot
     network_mode: host
