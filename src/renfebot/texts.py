@@ -43,6 +43,7 @@ texts_raw = {
 "CANCEL" : "Cancelar"
 , "ACCESS_GRANTED": "Acceso permitido por admin."
 , "ACCESS_NOT_GRANTED": "Acceso no permitido por admin."
+, "PROBLEM_TRAINS": "Ha habido un problema obteniendo los trenes para el trayecto {origin} -> {destination} para el día {date}."
 }
 
 texts = {}

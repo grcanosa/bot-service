@@ -1,5 +1,6 @@
 python-telegram-bot==10.1.0
 emoji==0.5.0
 selenium==2.53.6
+#selenium==3.14.1
 pyvirtualdisplay
 pytest 

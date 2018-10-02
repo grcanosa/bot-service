@@ -106,9 +106,9 @@ def with_new_driver(fun):
             if driver is not None:
                 break
         if driver is None:
-            return False, None
+            return False, "NO_DRIVER"
         else:
-            ret = False,None
+            ret = False,"NO_TRAINS"
             try:
                 ret = fun(driver, *arg, **kw)
             except Exception as e:
@@ -132,7 +132,7 @@ def check_trip(driver,origin, destination, dat_go, dat_ret= None):
         return True, getTrains(driver)
     else:
         logger.info("NO TRAINS AVAILABLE")
-        return False, None
+        return False, "NO_TRAINS"
 
 
 

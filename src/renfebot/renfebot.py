@@ -76,8 +76,12 @@ class RenfeBot:
                                  text=msg,
                                  parse_mode=ParseMode.MARKDOWN)
         else:
-            bot.send_message(chat_id=userid, text=TEXTS["NO_TRAINS_FOUND"].format(
-                origin=origin, destination=dest, date=date))
+            if results[1] == "NO_TRAINS":
+                bot.send_message(chat_id=userid, text=TEXTS["NO_TRAINS_FOUND"].format(
+                    origin=origin, destination=dest, date=date))
+            else:
+                bot.send_message(chat_id=userid, text=TEXTS["PROBLEM_TRAINS"].format(
+                    origin=origin, destination=dest, date=date))
 
   
 

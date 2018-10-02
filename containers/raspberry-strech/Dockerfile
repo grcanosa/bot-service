@@ -14,6 +14,8 @@ RUN wget https://github.com/mozilla/geckodriver/releases/download/v0.19.1/geckod
     chmod a+x geckodriver && \
     mv geckodriver /usr/local/bin/
 
+
+
 ENV TZ=Europe/Madrid
 
 WORKDIR /code
