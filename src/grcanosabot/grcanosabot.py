@@ -15,10 +15,10 @@ from sarapiropos import SaraPiropoList
 from secret import TOKEN_GRCANOSABOT,CID_GRCANOSA,CID_SARA
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.DEBUG)
+                    level=logging.INFO)
 
-logger = logging.getLogger(__name__)
-
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 
 

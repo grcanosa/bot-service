@@ -15,9 +15,9 @@ import sys
 import logging
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.DEBUG)
+                    level=logging.INFO)
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 
 
@@ -34,8 +34,9 @@ def get_new_driver():
         profile.native_events_enabled = False
         driver = webdriver.Firefox(profile)
         driver.set_page_load_timeout(60)
-    except:
+    except Exception as e:
         logger.error("Cannot create driver")
+        logger.error(str(e))
     return driver
 
 
@@ -71,6 +72,7 @@ def getTrains(driver):
     trayectos = []
     trenes = driver.find_element_by_id("listaTrenesTBodyIda")
     rows = trenes.find_elements_by_xpath(".//tr[contains(@class,'trayectoRow')]")
+    logger.info("SIZE: "+str(len(rows)))
     # rows = rows + trenes.find_elements_by_xpath(".//tr[@class='trayectoRow row_alt']")
     # rows = rows + trenes.find_elements_by_xpath(".//tr[@class='trayectoRow last']")
     for r in rows:
@@ -91,13 +93,18 @@ def getTrains(driver):
             clase = r.find_element_by_xpath(".//td[@headers='colClase']//span").get_attribute("innerHTML")
             tarifa = r.find_element_by_xpath(".//td[@headers='colTarifa']//span").get_attribute("innerHTML")
         trayectos.append({"SALIDA":salT,"LLEGADA":lleT,"TIPO":tipo,"PRECIO":precio,"DURACION":float(dur)/3600,"CLASE":clase,"TARIFA":tarifa,"DISPONIBLE":disp})
+        #logger.info(trayectos)
     logger.debug("Returning arrary")
     return trayectos
 
 
 def with_new_driver(fun):
     def wrapper(*arg, ** kw):
-        driver = get_new_driver()
+        driver = None
+        for i in range(0,3):
+            driver = get_new_driver()
+            if driver is not None:
+                break
         if driver is None:
             return False, None
         else:
@@ -115,6 +122,7 @@ def with_new_driver(fun):
 
 @with_new_driver
 def check_trip(driver,origin, destination, dat_go, dat_ret= None):
+    logger.info("GETTING TRAINS!")
     driver.get("http://www.renfe.com")
     time.sleep(1)
     fill_elements(driver,origin, destination, dat_go, dat_ret )
