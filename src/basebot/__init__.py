@@ -1,4 +1,0 @@
-"""
-Module basebot
-@author: grcanosa
-"""
