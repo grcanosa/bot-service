@@ -1,6 +1,9 @@
 package com.grcanosa.grupobot
 
+import java.time.LocalDateTime
+
 import akka.actor.Cancellable
+import com.grcanosa.grupobot.model.Conversation
 import com.grcanosa.telegrambot.bot.user.{UserHandler, UserRegistry}
 import com.grcanosa.telegrambot.model.BotUser.PERMISSION_ALLOWED
 
@@ -15,9 +18,7 @@ trait GrupoBotUserConversationRandomizer extends UserRegistry {
   }
 
 
-  case class Conversation(uh1: UserHandler
-                          , uh2: UserHandler
-                          , cancel: Option[Cancellable])
+
 
   case class CancelConversation(conversation: Conversation)
 
@@ -45,7 +46,7 @@ trait GrupoBotUserConversationRandomizer extends UserRegistry {
 
     destUH.map{ duh =>
       BOTLOG.info(s"Conversation assigned to ${duh.user.name}")
-      val conv = Conversation(userH,duh,None)
+      val conv = Conversation(userH,duh,None,LocalDateTime.now().toString,LocalDateTime.now().toString)
       userConversations = conv +: userConversations
       conv
     }

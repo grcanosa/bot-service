@@ -1,8 +1,11 @@
 package com.grcanosa.grupobot
 
+import java.time.LocalDateTime
+
 import akka.actor.{Actor, ActorRef, Cancellable, Props}
 import com.bot4s.telegram.api.AkkaDefaults
 import com.bot4s.telegram.methods.{ForwardMessage, SendMessage}
+import com.grcanosa.grupobot.dao.ConversationDao
 import com.grcanosa.telegrambot.bot.BotWithAdmin
 import com.grcanosa.telegrambot.bot.BotWithAdmin.ForwardMessageTo
 import com.grcanosa.telegrambot.bot.user.UserHandler
@@ -38,9 +41,12 @@ object GrupoBot extends AkkaDefaults {
     override def botUserDao: BotUserDao = mongoUserDao
 
     override def interactionDao: InteractionDao = mongoInteractionDao
+
   }
 
-  val grupoBot = new GrupoBot(token,adminId)
+  val conversationDao = new ConversationDao(mongoHost,mongoPort,mongoDatabaseName)
+
+  val grupoBot = new GrupoBot(token,adminId,conversationDao)
 
 
 }
@@ -50,7 +56,8 @@ object GrupoBot extends AkkaDefaults {
 
 
 class GrupoBot(override val token: String
-               , override val adminId:Long)
+               , override val adminId:Long,
+               val conversationDao: ConversationDao)
               (implicit botDao: BotDao)
 extends BotWithAdmin(token, adminId)
 with GrupoBotUserConversationRandomizer{
@@ -75,7 +82,7 @@ with GrupoBotUserConversationRandomizer{
   }
 
   onMessage{ implicit msg =>
-    allowedUser(None) { uH =>
+    allowedUser(Some("message")) { uH =>
       isNotCommand { _ =>
         getUserConversation(uH) match {
           case Some(conv) => {
@@ -102,6 +109,7 @@ with GrupoBotUserConversationRandomizer{
         userConversations = userConversations.filter(_ isNotEqual conv)
         botActor ! SendMessage(conv.uh1.user.id,conversationEndedText)
         botActor ! SendMessage(conv.uh2.user.id,conversationEndedText)
+        conversationDao.addConversation(conv.copy(end=LocalDateTime.now().toString))
       }
 
       case _ =>
