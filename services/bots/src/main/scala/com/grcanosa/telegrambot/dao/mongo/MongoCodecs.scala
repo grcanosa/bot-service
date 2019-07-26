@@ -18,15 +18,15 @@ trait MongoCodecs {
   import org.bson.codecs.configuration.CodecRegistries.{fromRegistries, fromProviders}
 
 
-  case class BotUserMongo( id: Long, name: String, permission: String)
+  case class BotUserMongo( id: Long, name: String, permission: String, username: Option[String], lastName: Option[String])
 
 
   def fromBotUser(bu: BotUser) = {
-    BotUserMongo(bu.id,bu.name,bu.permission.value)
+    BotUserMongo(bu.id,bu.name,bu.permission.value,bu.username,bu.lastName)
   }
 
   def fromBotUserMongo(bum: BotUserMongo) = {
-    BotUser(bum.id,getPermission(bum.permission),bum.name)
+    BotUser(bum.id,getPermission(bum.permission),bum.name,bum.username,bum.lastName)
   }
 
 

@@ -5,7 +5,9 @@ import com.grcanosa.telegrambot.model.BotUser.BotUserPermission
 
 case class BotUser(id: Long
                    ,permission: BotUserPermission
-                  , name: String)
+                  , name: String
+                  , username: Option[String]
+                  , lastName: Option[String])
 
 
 object BotUser{
@@ -26,6 +28,6 @@ object BotUser{
   }
 
   def fromUser(user:User) = {
-      BotUser(user.id,PERMISSION_NOT_SET,user.firstName)
+      BotUser(user.id,PERMISSION_NOT_SET,user.firstName,user.username,user.lastName)
   }
 }
