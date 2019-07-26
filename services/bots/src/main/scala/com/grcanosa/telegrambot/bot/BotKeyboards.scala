@@ -1,16 +1,17 @@
 package com.grcanosa.telegrambot.bot
 
 import com.bot4s.telegram.models.{KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove}
+import com.grcanosa.telegrambot.model.BotUser
 
 trait BotKeyboards {
 
 
   val removeKeyboard = ReplyKeyboardRemove(true)
 
-  def permissionKeyboard(userId: Long) = {
+  def permissionKeyboard(user: BotUser) = {
     ReplyKeyboardMarkup(Seq(
-      Seq(KeyboardButton("/permission "+userId.toString+ " ALLOW")),
-      Seq(KeyboardButton("/permission "+userId.toString+ " NOTALLOW"))
+      Seq(KeyboardButton(s"/permission ${user.id} ALLOW")),
+      Seq(KeyboardButton(s"/permission ${user.id} NOTALLOW"))
       )
     )
   }

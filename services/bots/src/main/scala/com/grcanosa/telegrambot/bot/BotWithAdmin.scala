@@ -47,7 +47,7 @@ with Commands{
     botActor ! SendMessage(userH.user.id, userRequestPermissionResponse(userH.user.name))
     botActor ! SendMessage(adminId
       , s"User ${userH.user.name} request permission"
-      ,replyMarkup = Some(permissionKeyboard(userH.user.id)))
+      ,replyMarkup = Some(permissionKeyboard(userH.user)))
   }
 
   onCommand("/start"){ implicit msg =>
