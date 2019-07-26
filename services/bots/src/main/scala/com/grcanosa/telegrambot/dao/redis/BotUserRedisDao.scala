@@ -95,7 +95,7 @@ extends BotUserDao{
     } yield (permission, name)
 
     r.map{
-      case (Some(permission), Some(name)) => Some(BotUser(userId, BotUser.getPermission(permission), name))
+      case (Some(permission), Some(name)) => Some(BotUser(userId, BotUser.getPermission(permission), name,None, None))
       case _ => None
     }
 
