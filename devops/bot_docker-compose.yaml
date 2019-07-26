@@ -1,7 +1,12 @@
 version: '3'
 services:
   grupo_bot:
-
+    image: bot_service
+    container_name: grupobot
+    restart: unless-stopped
+    command: ["java","-jar","/app/grupobotapp.jar"]
+    environment:
+      - MONGOHOST=mongodb
 networks:
   default:
     external:
