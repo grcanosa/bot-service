@@ -12,6 +12,8 @@ trait BotUsersWithAdmin
   extends AkkaDefaults
     with UserRegistry {
 
+  import com.grcanosa.telegrambot.utils.BotUtils._
+
   def adminId: Long
 
   def userNotAllowed(userH: UserHandler)
@@ -33,6 +35,7 @@ trait BotUsersWithAdmin
       case PERMISSION_ALLOWED => action(userH)
       case PERMISSION_NOT_SET => userRequestPermission(userH)
       case PERMISSION_NOT_ALLOWED => userNotAllowed(userH)
+      case _ => BOTLOG.error(s"No permission for user ${userH.user.name}")
     }
   }
 

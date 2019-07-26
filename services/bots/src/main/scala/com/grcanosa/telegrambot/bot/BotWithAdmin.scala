@@ -35,6 +35,7 @@ with BotResponses
 with BotKeyboards
 with Commands{
 
+  import com.grcanosa.telegrambot.utils.BotUtils._
 
   override val client = new AkkaHttpClient(token)
   val botActor = system.actorOf(Props(new BotActor), name = "botActor")
@@ -44,6 +45,7 @@ with Commands{
   }
 
   override def userRequestPermission(userH: UserHandler): Unit = {
+    BOTLOG.info(s"User ${userH.user.id} requests permission")
     botActor ! SendMessage(userH.user.id, userRequestPermissionResponse(userH.user.name))
     val keyboard = permissionKeyboard(userH.user)
     botActor ! SendMessage(adminId,

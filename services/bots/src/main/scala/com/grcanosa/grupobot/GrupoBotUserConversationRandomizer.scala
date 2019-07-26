@@ -2,6 +2,7 @@ package com.grcanosa.grupobot
 
 import akka.actor.Cancellable
 import com.grcanosa.telegrambot.bot.user.{UserHandler, UserRegistry}
+import com.grcanosa.telegrambot.model.BotUser.PERMISSION_ALLOWED
 
 trait GrupoBotUserConversationRandomizer extends UserRegistry {
 
@@ -52,6 +53,7 @@ trait GrupoBotUserConversationRandomizer extends UserRegistry {
 
   def getUsersWithNoConversations() = {
     userHandlers.values.toSeq
+        .filter(uh => uh.user.permission == PERMISSION_ALLOWED)
       .filter(uh => getConversationForUser(uh).isEmpty)
   }
 
