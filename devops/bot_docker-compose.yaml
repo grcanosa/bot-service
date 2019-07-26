@@ -1,0 +1,8 @@
+version: '3'
+services:
+  grupo_bot:
+
+networks:
+  default:
+    external:
+      name: bot_network

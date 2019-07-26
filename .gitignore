@@ -5,6 +5,9 @@
 #SHARED DIR
 shared/*
 
+## IDEA
+*.idea*
+
 ### Linux ###
 *~
 
