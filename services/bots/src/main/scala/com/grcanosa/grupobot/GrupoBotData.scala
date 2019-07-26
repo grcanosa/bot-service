@@ -1,20 +1,22 @@
 package com.grcanosa.grupobot
 
+import com.grcanosa.grupobot.utils.GrupoUtils
 import com.vdurmont.emoji.EmojiParser
 
 import scala.concurrent.duration._
+import scala.util.Try
 
 object GrupoBotData {
 
   import com.grcanosa.telegrambot.utils.BotUtils._
-
+  import GrupoUtils._
 
   implicit class BotStrings(s: String){
     def bottext: String = EmojiParser.parseToUnicode(":robot_face::speech_balloon: "+s)
   }
 
 
-  val conversationDuration = 15 seconds
+  val conversationDuration = Try{configGrupo.getInt("grupobot.conversation.minutes")}.getOrElse(15) minutes
 
 
   val noConversationReadyText = (name: String) => {
