@@ -50,8 +50,8 @@ with Commands{
     val keyboard = permissionKeyboard(userH.user)
     botActor ! SendMessage(adminId,
       s"""User ${userH.user.name} requesting permission
-         |${keyboard.keyboard.head.head.text}
-         |${keyboard.keyboard.head(1).text}
+         |/permission ${userH.user.id} ALLOW
+         |/permission ${userH.user.id} NOTALLOW
          |""".stripMargin
       ,replyMarkup = Some(keyboard))
   }
