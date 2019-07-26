@@ -45,9 +45,13 @@ with Commands{
 
   override def userRequestPermission(userH: UserHandler): Unit = {
     botActor ! SendMessage(userH.user.id, userRequestPermissionResponse(userH.user.name))
-    botActor ! SendMessage(adminId
-      , s"User ${userH.user.name} request permission"
-      ,replyMarkup = Some(permissionKeyboard(userH.user)))
+    val keyboard = permissionKeyboard(userH.user)
+    botActor ! SendMessage(adminId,
+      s"""User ${userH.user.name} request permission"
+         |${keyboard.keyboard.head.head.text}
+         |${keyboard.keyboard.head(1).text}
+         |""".stripMargin
+      ,replyMarkup = Some(keyboard))
   }
 
   onCommand("/start"){ implicit msg =>
