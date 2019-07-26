@@ -18,6 +18,7 @@ object GrupoBotData {
 
   val conversationDuration = Try{configGrupo.getInt("grupobot.conversation.minutes")}.getOrElse(15) minutes
 
+  BOTLOG.info(s"Conversation set to last $conversationDuration")
 
   val noConversationReadyText = (name: String) => {
     s"Ahora mismo no te puedo asignar una conversación $name, inténtalo de nuevo más tarde!".bottext
