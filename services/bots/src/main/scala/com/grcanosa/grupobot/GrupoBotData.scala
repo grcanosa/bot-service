@@ -40,7 +40,8 @@ object GrupoBotData {
     List(
       "Hola, soy el bot de Los del Olmo :deciduous_tree:. Mi propósito es conectarte aleatoriamente con otros miembros del grupo."
       ,s"""Cada vez que escribas al bot enviaré tus mensajes aleatoriamente a otro miembro del grupo.
-         | Si el/ella te contesta sus mensajes te llegarán a ti. Diez minutos después de que os intercambiéis el
+         | Ninguno de los dos sabrá quién es el otro (excepto que os lo digáis, claro).
+         | Si ella/él te contesta, sus mensajes te llegarán a ti. Diez minutos después de que os intercambiéis el
          | último mensaje la conexión terminará y podréis empezar una nueva.
          |También podréis cancelar la conexión actual escribiendo: /cancelconexion.
          |""".stripMargin.replaceAll("\n","").emojize

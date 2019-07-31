@@ -83,8 +83,8 @@ with GrupoBotUserConversationRandomizer{
   }
 
   onMessage{ implicit msg =>
+    isNotCommand { _ =>
     allowedUser(Some("message")) { uH =>
-      isNotCommand { _ =>
         getUserConversation(uH) match {
           case Some(conv) => {
             botActor ! ForwardMessageTo(getConversationDestination(uH, conv).user.id, msg)

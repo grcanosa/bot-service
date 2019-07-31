@@ -28,6 +28,7 @@ trait BotUsersWithAdmin
   }
 
   def allowedUser(interaction:Option[String])( action: Action[UserHandler] )(implicit msg: Message) = {
+    BOTLOG.info(s"ALLOWED USER CALL: ${msg.text.getOrElse("NOTEXT")}")
     addInteraction(interaction)
     val user = userFromMessage(msg)
     val userH = getUser(user)
