@@ -11,6 +11,8 @@ trait GrupoBotUserConversationRandomizer extends UserRegistry {
 
   import com.grcanosa.telegrambot.utils.BotUtils._
 
+  private val rwLock = List()
+
   implicit class ConversationComparer(conv: Conversation){
     def isNotEqual(conv2: Conversation) = {
       conv.uh1.user.id != conv2.uh1.user.id || conv.uh2.user.id != conv2.uh2.user.id
@@ -33,26 +35,31 @@ trait GrupoBotUserConversationRandomizer extends UserRegistry {
 
 
   def getConversationForUser(userH: UserHandler) = {
-    userConversations.find{
-      conv => conv.uh1.user.id == userH.user.id || conv.uh2.user.id == userH.user.id
+    rwLock.synchronized {
+      userConversations.find {
+        conv => conv.uh1.user.id == userH.user.id || conv.uh2.user.id == userH.user.id
+      }
     }
   }
 
   def assignNewConversation(userH: UserHandler) = {
     BOTLOG.info(s"Assigning new conversation to user: ${userH.user.name}")
-    val destUH = getUsersWithNoConversations()
-      .filter(uh => uh.user.id != userH.user.id)
-      .chooseRandom()
+    rwLock.synchronized {
+      val destUH = getUsersWithNoConversations2()
+        .filter(uh => uh.user.id != userH.user.id)
+        .chooseRandom()
 
-    destUH.map{ duh =>
-      BOTLOG.info(s"Conversation assigned to ${duh.user.name}")
-      val conv = Conversation(userH,duh,None,LocalDateTime.now().toString,LocalDateTime.now().toString)
-      userConversations = conv +: userConversations
-      conv
+      destUH.map { duh =>
+        BOTLOG.info(s"Conversation assigned to ${duh.user.name}")
+        val conv = Conversation(userH, duh, None, LocalDateTime.now().toString, LocalDateTime.now().toString)
+        userConversations = conv +: userConversations
+        newConversation(conv)
+        conv
+      }
     }
   }
 
-  def getUsersWithNoConversations() = {
+  def getUsersWithNoConversations2() = {
     userHandlers.values.toSeq
         .filter(uh => uh.user.permission == PERMISSION_ALLOWED)
       .filter(uh => getConversationForUser(uh).isEmpty)
@@ -66,5 +73,7 @@ trait GrupoBotUserConversationRandomizer extends UserRegistry {
       conversation.uh1
     }
   }
+
+  def newConversation(conv: Conversation): Unit
 
 }

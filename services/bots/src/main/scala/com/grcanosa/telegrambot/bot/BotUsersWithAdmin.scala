@@ -41,9 +41,13 @@ trait BotUsersWithAdmin
 
   def isUserAdmin(userId: Long) = userId == adminId
 
-  def isAdmin(action: Action[Any])(implicit msg: Message) = {
+  val noAction = (_: Any) => ()
+
+  def isAdmin(action: Action[Any])(noAdminAction: Action[Any] = noAction)(implicit msg: Message) = {
     if(isUserAdmin(msg.chat.id)){
       action()
+    }else{
+      noAdminAction()
     }
   }
 
@@ -58,7 +62,7 @@ trait BotUsersWithAdmin
     userH.map{
       uH =>
         updateUser(uH.copy(user=uH.user.copy(permission = permission)))
-    }
+     }
   }
 
   def userFromMessage(msg: Message) = {

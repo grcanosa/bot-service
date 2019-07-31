@@ -6,6 +6,7 @@ import akka.actor.{Actor, ActorRef, Cancellable, Props}
 import com.bot4s.telegram.api.AkkaDefaults
 import com.bot4s.telegram.methods.{ForwardMessage, SendMessage}
 import com.grcanosa.grupobot.dao.ConversationDao
+import com.grcanosa.grupobot.model.Conversation
 import com.grcanosa.telegrambot.bot.BotWithAdmin
 import com.grcanosa.telegrambot.bot.BotWithAdmin.ForwardMessageTo
 import com.grcanosa.telegrambot.bot.user.UserHandler
@@ -67,8 +68,8 @@ with GrupoBotUserConversationRandomizer{
 
   val grupoBotActor = system.actorOf(Props(new GrupoBotActor()))
 
-  onCommand("/cancelconversation") { implicit msg =>
-    allowedUser(Some("cancelconversation")) { uH =>
+  onCommand("/cancelconexion") { implicit msg =>
+    allowedUser(Some("cancelconexion")) { uH =>
       getConversationForUser(uH) match {
         case Some(conv) => {
           conv.cancel.foreach(_.cancel())
@@ -133,4 +134,11 @@ with GrupoBotUserConversationRandomizer{
   override def startCmdResponse(name: String): String = startText
 
   override def helpCmdResponse(name: String) = helpText
+
+  override def newConversation(conv: Conversation): Unit = {
+    botActor ! SendMessage(conv.uh1.user.id,newConversationText(conv.uh1.user.name))
+    botActor ! SendMessage(conv.uh2.user.id,newConversationText(conv.uh2.user.name))
+  }
+
+  override def permissionGrantedResponse = permissionGrantedText
 }

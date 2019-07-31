@@ -19,5 +19,9 @@ trait BotResponses {
     s"Default help message $name"
   }
 
+  def permissionGrantedResponse = {
+    s"The admin has given you permission. Write /start to begin"
+  }
+
 
 }

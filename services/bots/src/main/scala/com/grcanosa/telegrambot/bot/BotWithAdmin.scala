@@ -62,9 +62,24 @@ with Commands{
     }
   }
 
+  onCommand("/users") { implicit msg =>
+    isAdmin{ _ =>
+      val msg = userHandlers.values.toSeq.map{ uh =>
+        s"${uh.user.id};${uh.user.name};${uh.user.permission}"
+      }.mkString("\n")
+      botActor ! SendMessage(adminId,msg)
+    }()
+  }
+
   onCommand("/help"){ implicit msg =>
     allowedUser(Some("help")) { uH =>
-      reply(helpCmdResponse(uH.user.name))
+      isAdmin { _ =>
+        val normalmsg = helpCmdResponse(uH.user.name)
+        val realmsg = normalmsg + "\n" + "/users\n/permission"
+        reply(realmsg)
+      }{ _ =>
+        reply(helpCmdResponse(uH.user.name))
+      }
     }
   }
 
@@ -77,6 +92,7 @@ with Commands{
               case "ALLOW" => {
                 changeUserPermission(uid,PERMISSION_ALLOWED)
                 reply("Allowing user",replyMarkup = Some(removeKeyboard))
+                botActor ! SendMessage(uid,permissionGrantedResponse)
               }
               case "NOTALLOW" => {
                 changeUserPermission(uid,PERMISSION_NOT_ALLOWED)
@@ -88,6 +104,8 @@ with Commands{
           case _ => reply("Invalid command")
         }
       }
+    }{ _ =>
+      reply("You do not have permission to access this functionality")
     }
   }
 
