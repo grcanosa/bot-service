@@ -2,6 +2,7 @@ version: '3'
 services:
   grupo_bot:
     image: bot_service
+    restart: always
     container_name: grupobot
     restart: unless-stopped
     command: ["java","-jar","/app/grupobotapp.jar"]
