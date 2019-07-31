@@ -65,6 +65,7 @@ with Commands{
   onCommand("/users") { implicit msg =>
     isAdmin{ _ =>
       val msg = userHandlers.values.toSeq.map{ uh =>
+        BOTLOG.info(s"User Handler is $uh")
         s"${uh.user.id};${uh.user.name};${uh.user.permission}"
       }.mkString("\n")
       botActor ! SendMessage(adminId,msg)
