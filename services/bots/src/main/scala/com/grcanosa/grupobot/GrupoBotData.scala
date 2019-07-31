@@ -29,7 +29,7 @@ object GrupoBotData {
   }
 
   val newConversationText = (name: String) => {
-    s"Conexión establecida $name".bottext
+    s"Conexión establecida.".bottext
   }
 
   val conversationEndedText = {
