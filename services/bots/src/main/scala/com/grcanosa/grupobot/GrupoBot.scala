@@ -5,7 +5,8 @@ import java.time.LocalDateTime
 import akka.actor.{Actor, ActorRef, Cancellable, Props}
 import com.bot4s.telegram.api.AkkaDefaults
 import com.bot4s.telegram.methods.{ForwardMessage, SendMessage}
-import com.grcanosa.grupobot.dao.ConversationDao
+import com.bot4s.telegram.models.Message
+import com.grcanosa.grupobot.dao.{ConversationDao, WordCountDao}
 import com.grcanosa.grupobot.model.Conversation
 import com.grcanosa.telegrambot.bot.BotWithAdmin
 import com.grcanosa.telegrambot.bot.BotWithAdmin.ForwardMessageTo
@@ -16,6 +17,7 @@ import com.grcanosa.telegrambot.dao.redis.BotUserRedisDao
 import com.grcanosa.telegrambot.model.BotUser
 
 import scala.concurrent.duration._
+import scala.util.Try
 
 object GrupoBot extends AkkaDefaults {
   import com.grcanosa.grupobot.utils.GrupoUtils._
@@ -47,7 +49,9 @@ object GrupoBot extends AkkaDefaults {
 
   val conversationDao = new ConversationDao(mongoHost,mongoPort,mongoDatabaseName)
 
-  val grupoBot = new GrupoBot(token,adminId,conversationDao)
+  val wordCountDao = new WordCountDao(mongoHost,mongoPort,mongoDatabaseName)
+
+  val grupoBot = new GrupoBot(token,adminId,conversationDao,wordCountDao)
 
 
 }
@@ -56,9 +60,11 @@ object GrupoBot extends AkkaDefaults {
 
 
 
-class GrupoBot(override val token: String
-               , override val adminId:Long,
-               val conversationDao: ConversationDao)
+class GrupoBot(override val token: String,
+               override val adminId:Long,
+               val conversationDao: ConversationDao,
+               val wordCountDao: WordCountDao
+              )
               (implicit botDao: BotDao)
 extends BotWithAdmin(token, adminId)
 with GrupoBotUserConversationRandomizer{
@@ -82,9 +88,26 @@ with GrupoBotUserConversationRandomizer{
     }
   }
 
+  val wordRegex = "[\\p{L}]+".r
+
+  def addMessageToDao(message: Message) = {
+    //BOTLOG.info(s"Adding message to DB ${message.text}")
+    val words = Try {
+      message.text.map { str =>
+        wordRegex.findAllIn(str).matchData.map(_.group(0)).toList
+      }
+    }.recover{
+      case e => BOTLOG.error(s"$e"); Some(List.empty[String])
+    }.getOrElse(Some(List.empty[String]))
+    //BOTLOG.info(s"WORDS: $words")
+    words.map(wordList =>
+      wordList.map(_.toLowerCase).map(wordCountDao.increaseWordCount))
+  }
+
   onMessage{ implicit msg =>
     isNotCommand { _ =>
     allowedUser(Some("message")) { uH =>
+        addMessageToDao(msg)
         getUserConversation(uH) match {
           case Some(conv) => {
             botActor ! ForwardMessageTo(getConversationDestination(uH, conv).user.id, msg)
