@@ -45,13 +45,13 @@ trait GrupoBotHugChain {
 
   def permittedUserHandlers: Seq[UserHandler]
 
-  var gonzalosNumber = 4
-
-  val gonzalosHandlers = (1 to 5).map(n => UserHandler(BotUser(15111383,PERMISSION_ALLOWED,"Gonzalo"+n.toString,None,None),ActorRef.noSender))
+//  var gonzalosNumber = 4
+//
+//  val gonzalosHandlers = (1 to 5).map(n => UserHandler(BotUser(15111383,PERMISSION_ALLOWED,"Gonzalo"+n.toString,None,None),ActorRef.noSender))
 
   def getRemainingUserHandlers(hugChain: HugChain) = {
-    gonzalosNumber -= 1
-    permittedUserHandlers.filter( hugChain.users.contains(_)) ++ gonzalosHandlers.slice(0,gonzalosNumber)
+   // gonzalosNumber -= 1
+    permittedUserHandlers.filter(! hugChain.users.contains(_)) //++ gonzalosHandlers.slice(0,gonzalosNumber)
   }
 
   def userHandlersInlineKeyboard(hugChain: HugChain) = {
@@ -66,7 +66,7 @@ trait GrupoBotHugChain {
     hugChain.users match {
       case Nil => ("",None)
       case first :: Nil => chainStartedMessage(hugChain)
-      case li if li.size == permittedUserHandlers.size + gonzalosNumber => chainEndedMessage(hugChain)
+      case li if li.size == permittedUserHandlers.size  => chainEndedMessage(hugChain)
       case _ => chainContinueMessage(hugChain)
     }
   }
