@@ -27,7 +27,7 @@ trait UserRegistry extends BotDao{
     case Success(seqU) => seqU match {
       case Seq() => BOTLOG.info("Empty user list retrived from database")
       case _ => seqU.foreach{ bu =>
-        BOTLOG.info(s"Loading user: ${bu.id.toString}, ${bu.name}")
+        BOTLOG.info(s"Loading user: ${bu.id.toString}, ${bu.name} with permission: ${bu.permission.toString}")
         userHandlers.update(bu.id,UserHandler(bu,createNewUserActor(bu)))
       }
     }

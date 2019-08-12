@@ -1,4 +1,4 @@
-package com.grcanosa.grcanosabot
+package com.grcanosa.bots.grcanosabot
 
 object GrcanosaBotApp extends App{
 

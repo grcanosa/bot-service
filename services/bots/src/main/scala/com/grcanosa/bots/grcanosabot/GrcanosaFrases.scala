@@ -1,10 +1,10 @@
-package com.grcanosa.grcanosabot
+package com.grcanosa.bots.grcanosabot
 
 import scala.io.Source
 
 trait GrcanosaFrases {
 
-  import com.grcanosa.grcanosabot.utils.GrcanosaBotUtils._
+  import com.grcanosa.bots.grcanosabot.utils.GrcanosaBotUtils._
 
   import com.grcanosa.telegrambot.utils.BotUtils._
 

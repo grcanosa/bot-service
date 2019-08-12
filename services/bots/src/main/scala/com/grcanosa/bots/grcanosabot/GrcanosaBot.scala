@@ -1,4 +1,4 @@
-package com.grcanosa.grcanosabot
+package com.grcanosa.bots.grcanosabot
 
 import java.time.LocalDateTime
 
@@ -6,7 +6,7 @@ import akka.actor.{Actor, ActorRef, Props}
 import akka.stream.scaladsl.Source
 import com.bot4s.telegram.api.AkkaDefaults
 import com.bot4s.telegram.methods.SendMessage
-import com.grcanosa.grcanosabot.GrcanosaBot.{DimeAlgoBonito, DimeAlgoRealmenteBonito, StartDayMessage}
+import GrcanosaBot.{DimeAlgoBonito, DimeAlgoRealmenteBonito, StartDayMessage}
 import com.grcanosa.telegrambot.bot.BotWithAdmin
 import com.grcanosa.telegrambot.dao.{BotDao, BotUserDao, InteractionDao}
 import com.grcanosa.telegrambot.dao.mongo.{BotUserMongoDao, InteractionMongoDao}
@@ -20,7 +20,7 @@ object GrcanosaBot extends AkkaDefaults{
   case object StartDayMessage
   case object DimeAlgoRealmenteBonito
 
-  import com.grcanosa.grcanosabot.utils.GrcanosaBotUtils._
+  import com.grcanosa.bots.grcanosabot.utils.GrcanosaBotUtils._
 
   val token = configGrcanosa.getString("bot.token")
   val adminId = configGrcanosa.getLong("bot.adminId")

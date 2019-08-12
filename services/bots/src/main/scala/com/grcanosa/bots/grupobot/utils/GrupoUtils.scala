@@ -1,4 +1,4 @@
-package com.grcanosa.grupobot.utils
+package com.grcanosa.bots.grupobot.utils
 
 import com.typesafe.config.{Config, ConfigFactory}
 

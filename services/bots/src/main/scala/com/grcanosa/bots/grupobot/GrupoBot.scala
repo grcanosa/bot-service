@@ -1,13 +1,14 @@
-package com.grcanosa.grupobot
+package com.grcanosa.bots.grupobot
 
 import java.time.LocalDateTime
 
 import akka.actor.{Actor, ActorRef, Cancellable, Props}
 import com.bot4s.telegram.api.AkkaDefaults
-import com.bot4s.telegram.methods.{ForwardMessage, SendMessage}
-import com.bot4s.telegram.models.Message
-import com.grcanosa.grupobot.dao.{ConversationDao, WordCountDao}
-import com.grcanosa.grupobot.model.Conversation
+import com.bot4s.telegram.api.declarative.Callbacks
+import com.bot4s.telegram.methods.{EditMessageReplyMarkup, ForwardMessage, SendMessage}
+import com.bot4s.telegram.models.{ChatId, Message}
+import com.grcanosa.bots.grupobot.dao.{ConversationDao, WordCountDao}
+import com.grcanosa.bots.grupobot.model.Conversation
 import com.grcanosa.telegrambot.bot.BotWithAdmin
 import com.grcanosa.telegrambot.bot.BotWithAdmin.ForwardMessageTo
 import com.grcanosa.telegrambot.bot.user.UserHandler
@@ -15,12 +16,13 @@ import com.grcanosa.telegrambot.dao.{BotDao, BotUserDao, InteractionDao}
 import com.grcanosa.telegrambot.dao.mongo.{BotUserMongoDao, InteractionMongoDao}
 import com.grcanosa.telegrambot.dao.redis.BotUserRedisDao
 import com.grcanosa.telegrambot.model.BotUser
+import com.grcanosa.telegrambot.model.BotUser.PERMISSION_ALLOWED
 
 import scala.concurrent.duration._
-import scala.util.Try
+import scala.util.{Success, Try}
 
 object GrupoBot extends AkkaDefaults {
-  import com.grcanosa.grupobot.utils.GrupoUtils._
+  import com.grcanosa.bots.grupobot.utils.GrupoUtils._
 
   val token = configGrupo.getString("bot.token")
   val adminId = configGrupo.getLong("bot.adminId")
@@ -67,7 +69,9 @@ class GrupoBot(override val token: String,
               )
               (implicit botDao: BotDao)
 extends BotWithAdmin(token, adminId)
-with GrupoBotUserConversationRandomizer{
+with GrupoBotUserConversationRandomizer
+with GrupoBotHugChain
+with Callbacks{
 
   import GrupoBotData._
   import com.grcanosa.telegrambot.utils.BotUtils._
@@ -85,6 +89,33 @@ with GrupoBotUserConversationRandomizer{
           botActor ! SendMessage(uH.user.id,noConversationAssigned(uH.user.name))
         }
       }
+    }
+  }
+
+  onCommand("/cadenadeabrazos"){ implicit msg =>
+    allowedUser(Some("cadenaabrazos")) { uH =>
+      val hugChain = newHugChain(uH)
+      val (txt,keyboard) = getHugChainMessage(hugChain)
+      reply(txt,replyMarkup = keyboard)
+    }
+  }
+
+  onCallbackWithTag(hugChainCallbackDataKeyword){ implicit cbk =>
+    Try {
+      for {
+        cbkData <- getCallbackData(cbk.data)
+        destUserH <- getUser(cbkData._2)
+        chain <- getChain(cbkData._1)
+        msg <- cbk.message
+        newChain = increaseChain(destUserH, chain)
+        txtKeyboard = getHugChainMessage(newChain)
+        m = EditMessageReplyMarkup(Some(ChatId(msg.source)), Some(msg.messageId), cbk.inlineMessageId, replyMarkup = None)
+        f = request(m)
+        _ = botActor ! SendMessage(msg.source,chainContinuingText(newChain))
+        _ = botActor ! SendMessage(destUserH.user.id, txtKeyboard._1, replyMarkup = txtKeyboard._2)
+      } yield f
+    }.recover{
+      case e => BOTLOG.error(e.toString)
     }
   }
 
@@ -164,4 +195,7 @@ with GrupoBotUserConversationRandomizer{
   }
 
   override def permissionGrantedResponse = permissionGrantedText
+
+  override def permittedUserHandlers: Seq[UserHandler] = userHandlers.values.toSeq
+                                .filter(uh => uh.user.permission == PERMISSION_ALLOWED)
 }

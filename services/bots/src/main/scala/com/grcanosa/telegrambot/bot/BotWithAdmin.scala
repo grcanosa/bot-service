@@ -117,7 +117,7 @@ with Commands{
     override def receive = {
       case sm: SendMessage => request(sm)
       case sp: SendPhoto => request(sp)
-      case sa: SendAnimation => request(sa)
+      case sam: SendAnimation => request(sam)
       case sa: SendAudio => request(sa)
       case sv: SendVideo => request(sv)
       case svn: SendVideoNote => request(svn)

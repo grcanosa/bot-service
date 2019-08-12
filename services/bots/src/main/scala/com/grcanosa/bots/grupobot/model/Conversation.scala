@@ -1,4 +1,4 @@
-package com.grcanosa.grupobot.model
+package com.grcanosa.bots.grupobot.model
 
 import akka.actor.Cancellable
 import com.grcanosa.telegrambot.bot.user.UserHandler

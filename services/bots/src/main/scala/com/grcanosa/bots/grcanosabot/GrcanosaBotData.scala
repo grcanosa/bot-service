@@ -1,10 +1,10 @@
-package com.grcanosa.grcanosabot
+package com.grcanosa.bots.grcanosabot
 
 object GrcanosaBotData {
 
   import com.grcanosa.telegrambot.utils.BotUtils._
 
-  import com.grcanosa.grcanosabot.utils.GrcanosaBotUtils._
+  import com.grcanosa.bots.grcanosabot.utils.GrcanosaBotUtils._
 
   val saraId = configGrcanosa.getLong("bot.saraId")
 

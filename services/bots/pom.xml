@@ -124,7 +124,7 @@
                                     <resource>reference.conf</resource>
                                 </transformer>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.grcanosa.grupobot.GrupoBotApp</mainClass>
+                                    <mainClass>com.grcanosa.bots.grupobot.GrupoBotApp</mainClass>
                                 </transformer>
                             </transformers>
                             <finalName>grupobotapp</finalName>

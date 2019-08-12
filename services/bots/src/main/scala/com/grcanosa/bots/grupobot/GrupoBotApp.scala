@@ -1,4 +1,4 @@
-package com.grcanosa.grupobot
+package com.grcanosa.bots.grupobot
 
 object GrupoBotApp extends App {
 
