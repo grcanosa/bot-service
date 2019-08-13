@@ -2,6 +2,7 @@ package com.grcanosa.bots.grupobot
 
 import com.grcanosa.bots.grupobot.GrupoBotHugChain.HugChain
 import com.grcanosa.bots.grupobot.utils.GrupoUtils
+import com.grcanosa.telegrambot.bot.user.UserHandler
 import com.vdurmont.emoji.EmojiParser
 
 import scala.concurrent.duration._
@@ -84,6 +85,10 @@ object GrupoBotData {
 
   def abrazadoRandom = Seq("abrazado", "achuchado","estrujado").chooseRandom().get
 
+  def abrazoNombreRandom = Seq("abrazo","achuchón", "estrujón").chooseRandom().get
+
+  def abrazoRandom = Seq("abrazó", "achuchó", "estrujó").chooseRandom().get
+
   def abrazosRandom = Seq("abrazos","achuchones", "estrujones").chooseRandom().get
 
   val hugChainStartedText = (name: String) => s"""$name, acabas de iniciar una cadena de ${abrazosRandom}! :smile: ¡Elige a quién quieres ${abrazarRandom}!""".stripMargin.bottext
@@ -102,4 +107,19 @@ object GrupoBotData {
 
   val chainContinuingText = (chain: HugChain) =>
     s"¡¡¡Bieeeeeennnn!!!, la cadena continúa hacia ${chain.users.head.user.name}".bottext
+
+  def abrazoRecursion(li: List[UserHandler],txt: String): String = li match {
+    case Nil => txt
+    case u :: Nil => txt+"." //s"; que recibió el ${abrazoNombreRandom} recursivo de todos!"
+    case u1 :: u2 :: rest => {
+      val txt2 = txt match {
+        case "" => u1.user.name +" "+ abrazoRandom + " a " + u2.user.name
+        case _ => txt + ", que " + abrazoRandom + " a " + u2.user.name
+      }
+      abrazoRecursion(u2 :: rest, txt2)
+    }
+  }
+
+  val chainCompletedText = (chain: HugChain) =>
+    s"¡Acaba de terminar la cadena de ${abrazosRandom} que empezó ${chain.users.last.user.name}! ${abrazoRecursion(chain.users.reverse,"")} "
 }

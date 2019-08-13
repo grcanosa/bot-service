@@ -102,7 +102,7 @@ with Callbacks{
 
   onCallbackWithTag(hugChainCallbackDataKeyword){ implicit cbk =>
     Try {
-      for {
+      val res = for {
         cbkData <- getCallbackData(cbk.data)
         destUserH <- getUser(cbkData._2)
         chain <- getChain(cbkData._1)
@@ -111,9 +111,20 @@ with Callbacks{
         txtKeyboard = getHugChainMessage(newChain)
         m = EditMessageReplyMarkup(Some(ChatId(msg.source)), Some(msg.messageId), cbk.inlineMessageId, replyMarkup = None)
         f = request(m)
-        _ = botActor ! SendMessage(msg.source,chainContinuingText(newChain))
         _ = botActor ! SendMessage(destUserH.user.id, txtKeyboard._1, replyMarkup = txtKeyboard._2)
-      } yield f
+      } yield (txtKeyboard, newChain, msg.source)
+      res match {
+        case Some(((_,Some(keyboard)), newCh, source)) => {
+          botActor ! SendMessage(source,chainContinuingText(newCh))
+        }
+        case Some(((_,None),newCh,_)) => {
+          val txtCompleted = chainCompletedText(newCh)
+          newCh.users.tail.map(uh =>
+            botActor ! SendMessage(uh.user.id,txtCompleted)
+          )
+        }
+        case _ => BOTLOG.error("Problem processing message")
+      }
     }.recover{
       case e => BOTLOG.error(e.toString)
     }
