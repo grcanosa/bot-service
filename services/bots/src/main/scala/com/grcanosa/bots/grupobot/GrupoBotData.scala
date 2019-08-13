@@ -121,5 +121,5 @@ object GrupoBotData {
   }
 
   val chainCompletedText = (chain: HugChain) =>
-    s"¡Acaba de terminar la cadena de ${abrazosRandom} que empezó ${chain.users.last.user.name}! ${abrazoRecursion(chain.users.reverse,"")} "
+    s"¡Acaba de terminar la cadena de ${abrazosRandom} que empezó ${chain.users.last.user.name}! ${abrazoRecursion(chain.users.reverse,"")}".bottext
 }
