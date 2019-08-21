@@ -4,6 +4,7 @@ import akka.actor.{ActorRef, ActorSystem, Props}
 import com.bot4s.telegram.models.User
 import com.grcanosa.telegrambot.dao.BotDao
 import com.grcanosa.telegrambot.model.BotUser
+import com.grcanosa.telegrambot.model.BotUser.PERMISSION_ALLOWED
 
 import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration._
@@ -21,6 +22,9 @@ trait UserRegistry extends BotDao{
 
 
   val userHandlers = collection.mutable.Map[Long, UserHandler]()
+
+  def permittedUserHandlers =
+    userHandlers.filter(_._2.user.permission == PERMISSION_ALLOWED).values.toSeq
 
   botUserDao.getUsers().onComplete{
     case Failure(exception) => BOTLOG.error(s"Error getting users ${exception.toString}")

@@ -6,7 +6,7 @@ import akka.actor.{Actor, ActorRef, Cancellable, Props}
 import com.bot4s.telegram.api.AkkaDefaults
 import com.bot4s.telegram.api.declarative.Callbacks
 import com.bot4s.telegram.methods.{EditMessageReplyMarkup, ForwardMessage, SendMessage}
-import com.bot4s.telegram.models.{ChatId, Message}
+import com.bot4s.telegram.models.{ChatId, InlineKeyboardMarkup, Message}
 import com.grcanosa.bots.grupobot.dao.{ConversationDao, WordCountDao}
 import com.grcanosa.bots.grupobot.model.Conversation
 import com.grcanosa.telegrambot.bot.BotWithAdmin
@@ -91,44 +91,37 @@ with Callbacks{
       }
     }
   }
-
+//
   onCommand("/cadenadeabrazos"){ implicit msg =>
     allowedUser(Some("cadenaabrazos")) { uH =>
       val hugChain = newHugChain(uH)
-      val (txt,keyboard) = getHugChainMessage(hugChain)
+      val (txt,keyboard) = GrupoBotHugChain.getHugChainMessage(hugChain,permittedUserHandlers)
       reply(txt,replyMarkup = keyboard)
     }
   }
 
   onCallbackWithTag(hugChainCallbackDataKeyword){ implicit cbk =>
-    Try {
-      val res = for {
-        cbkData <- getCallbackData(cbk.data)
-        destUserH <- getUser(cbkData._2)
-        chain <- getChain(cbkData._1)
-        msg <- cbk.message
-        newChain = increaseChain(destUserH, chain)
-        txtKeyboard = getHugChainMessage(newChain)
-        m = EditMessageReplyMarkup(Some(ChatId(msg.source)), Some(msg.messageId), cbk.inlineMessageId, replyMarkup = None)
-        f = request(m)
-        _ = botActor ! SendMessage(destUserH.user.id, txtKeyboard._1, replyMarkup = txtKeyboard._2)
-      } yield (txtKeyboard, newChain, msg.source)
-      res match {
-        case Some(((_,Some(keyboard)), newCh, source)) => {
-          botActor ! SendMessage(source,chainContinuingText(newCh))
+    processHugChainCallbackData(cbk.message,cbk.data) match {case Some((msg,newChain,destUH,txt,keyboard)) =>
+      val editM = EditMessageReplyMarkup(Some(ChatId(msg.source)), Some(msg.messageId), cbk.inlineMessageId,replyMarkup = None)
+      request(editM)
+      botActor ! SendMessage(destUH.user.id, txt, replyMarkup = keyboard)
+      keyboard match {
+        case Some(k) => botActor ! SendMessage(msg.source,chainContinuingText(newChain))
+        case None => {
+          val txtCompleted = chainCompletedText(newChain)
+          newChain
+            .users
+            .tail
+            .foreach { userH =>
+              botActor ! SendMessage(userH.user.id, txtCompleted)
+            }
         }
-        case Some(((_,None),newCh,_)) => {
-          val txtCompleted = chainCompletedText(newCh)
-          newCh.users.tail.map(uh =>
-            botActor ! SendMessage(uh.user.id,txtCompleted)
-          )
-        }
-        case _ => BOTLOG.error("Problem processing message")
       }
-    }.recover{
-      case e => BOTLOG.error(e.toString)
+
     }
   }
+
+//
 
   val wordRegex = "[\\p{L}]+".r
 
@@ -207,6 +200,5 @@ with Callbacks{
 
   override def permissionGrantedResponse = permissionGrantedText
 
-  override def permittedUserHandlers: Seq[UserHandler] = userHandlers.values.toSeq
-                                .filter(uh => uh.user.permission == PERMISSION_ALLOWED)
+
 }

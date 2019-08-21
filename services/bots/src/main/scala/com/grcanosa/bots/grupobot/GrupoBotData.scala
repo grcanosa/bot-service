@@ -72,12 +72,12 @@ object GrupoBotData {
   val hugChainSeparator = ";"
   val hugChainCallbackDataKeyword = "HUGCHAIN"
 
-  def hugChainCallbackData(id:Long, chainId: Long) = Seq(hugChainCallbackDataKeyword,chainId.toString,id.toString).mkString(hugChainSeparator)
+  def hugChainCallbackData(id:Long, chainId: String) = Seq(hugChainCallbackDataKeyword,chainId,id.toString).mkString(hugChainSeparator)
 
-  def getCallbackData(data: Option[String]) = data
+  def parseCallbackInfo(data: Option[String]) = data
             .map(_.split(hugChainSeparator).toSeq match
                    {
-                    case Seq(_,chainId,id) => (chainId.toLong,id.toLong)
+                    case Seq(hugChainCallbackDataKeyword,chainId,id) => (chainId,id.toLong)
                   })
 
 
@@ -93,20 +93,20 @@ object GrupoBotData {
 
   val hugChainStartedText = (name: String) => s"""$name, acabas de iniciar una cadena de ${abrazosRandom}! :smile: ¡Elige a quién quieres ${abrazarRandom}!""".stripMargin.bottext
 
-  val hugChainEndText = (chain: HugChain) =>
-    s"""${chain.users.head.user.name}, eres el final de una cadena de $abrazosRandom. :smile::smiley::confetti_ball::tada: Acabas de ser $abrazadoRandom
-       | por ${chain.users.tail.view.init.map(_.user.name).mkString(",")} y ${chain.users.tail.last.user.name}.
-       | Puedes empezar otra cadena de abrazos escribiendo /cadenadeabrazos.
-       |""".bottext.stripMargin
+  def hugChainEndText(chain: HugChain) =
+    s"""${chain.users.head.user.name}, eres el final de una cadena de $abrazosRandom. :smile::smiley::confetti_ball::tada:
+       |Acabas de ser $abrazadoRandom por ${abrazoRecursion2(chain.users.tail,"")}
+       |Puedes empezar otra cadena de abrazos escribiendo /cadenadeabrazos.
+       |""".stripMargin.bottext.replace('\n',' ')
 
 
-  val hugChainContinueText = (chain: HugChain) =>
+  def hugChainContinueText(chain: HugChain) =
     s"""${chain.users.head.user.name}, ${chain.users.tail.head.user.name} acaba de incluirte en
        | una cadena de ${abrazosRandom} virtual. :smile::smiley::open_mouth::smile::smiley: ¡Puedes elegir a otra persona para continuar la cadena!
-       |""".bottext.stripMargin
+       |""".stripMargin.bottext
 
-  val chainContinuingText = (chain: HugChain) =>
-    s"¡¡¡Bieeeeeennnn!!!, la cadena continúa hacia ${chain.users.head.user.name}".bottext
+  def chainContinuingText(chain: HugChain) =
+    s"¡¡¡Bieeeeeennnn!!!, la cadena continúa hacia ${chain.users.head.user.name}.".bottext
 
   def abrazoRecursion(li: List[UserHandler],txt: String): String = li match {
     case Nil => txt
@@ -120,6 +120,18 @@ object GrupoBotData {
     }
   }
 
-  val chainCompletedText = (chain: HugChain) =>
+  def abrazoRecursion2(li: List[UserHandler],txt: String): String = li match {
+    case Nil => txt
+    case u :: Nil => txt+"." //s"; que recibió el ${abrazoNombreRandom} recursivo de todos!"
+    case u1 :: u2 :: rest => {
+      val txt2 = txt match {
+        case "" => u1.user.name +" que fue "+ abrazadoRandom + " por " + u2.user.name
+        case _ => txt + ", que fue " + abrazadoRandom + " por " + u2.user.name
+      }
+      abrazoRecursion2(u2 :: rest, txt2)
+    }
+  }
+
+  def chainCompletedText(chain: HugChain) =
     s"¡Acaba de terminar la cadena de ${abrazosRandom} que empezó ${chain.users.last.user.name}! ${abrazoRecursion(chain.users.reverse,"")}".bottext
 }
