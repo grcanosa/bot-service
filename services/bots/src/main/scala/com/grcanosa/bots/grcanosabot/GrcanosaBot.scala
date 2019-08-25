@@ -82,12 +82,11 @@ with HomeAssistant {
   }
 
   onCommand("/termo15"){ implicit msg =>
-    allowedUser(None) { uH =>
+    allowedUser(Some("termo15")) { uH =>
       addTermoMinutes(15).foreach{ (st:Double) =>
         reply(s"HOME => El termo está ahora mismo a ${st.toInt} minutos")
       }
     }
-
   }
 
 
