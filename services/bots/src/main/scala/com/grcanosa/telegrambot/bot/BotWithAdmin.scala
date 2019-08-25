@@ -38,6 +38,7 @@ with Commands{
   import com.grcanosa.telegrambot.utils.BotUtils._
 
   override val client = new AkkaHttpClient(token)
+
   val botActor = system.actorOf(Props(new BotActor), name = "botActor")
 
   override def userNotAllowed(userH: UserHandler): Unit = {

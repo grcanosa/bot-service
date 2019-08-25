@@ -13,7 +13,7 @@ import com.grcanosa.telegrambot.dao.mongo.{BotUserMongoDao, InteractionMongoDao}
 import com.grcanosa.telegrambot.model.BotUser
 
 import scala.concurrent.duration._
-
+import com.grcanosa.telegrambot.utils.BotUtils.BOTLOG
 
 object GrcanosaBot extends AkkaDefaults{
   case object DimeAlgoBonito
@@ -41,15 +41,19 @@ object GrcanosaBot extends AkkaDefaults{
     override def interactionDao: InteractionDao = mongoInteractionDao
   }
 
+  val homeAssistantToken = configGrcanosa.getString("bot.homeassistant_token")
 
-  val bot = new GrcanosaBot(token,adminId)
+  val bot = new GrcanosaBot(token,adminId,homeAssistantToken)
 }
 
 
-class GrcanosaBot(override val token: String,override val adminId: Long)
+class GrcanosaBot(override val token: String,override val adminId: Long, val homeAssistantToken: String)
                  (implicit botDao: BotDao)
   extends BotWithAdmin(token,adminId)
-with GrcanosaFrases {
+with GrcanosaFrases
+with HomeAssistant {
+
+  //override val homeAssistantToken = homeAssistantTokenIn
 
   import GrcanosaBotData._
 
@@ -77,6 +81,15 @@ with GrcanosaFrases {
     }
   }
 
+  onCommand("/termo15"){ implicit msg =>
+    allowedUser(None) { uH =>
+      addTermoMinutes(15).foreach{ (st:Double) =>
+        reply(s"HOME => El termo está ahora mismo a ${st.toInt} minutos")
+      }
+    }
+
+  }
+
 
 
 
@@ -99,9 +112,11 @@ with GrcanosaFrases {
     override def receive = {
       case DimeAlgoBonito => {
         dimeAlgoBonitoCount match {
+          case 0 => botActor ! SendMessage(botUser.id,getAlgoBonito)
           case c if c % 3 == 0 => botActor ! SendMessage(botUser.id,noSeasPresumidoText(botUser.name))
           case _ => botActor ! SendMessage(botUser.id,getAlgoBonito)
         }
+        dimeAlgoBonitoCount+= 1
       }
       case DimeAlgoRealmenteBonito => {
         botUser.id match {

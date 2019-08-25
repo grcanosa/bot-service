@@ -8,6 +8,14 @@ services:
     command: ["java","-jar","/app/grupobotapp.jar"]
     environment:
       - MONGOHOST=mongodb
+  grcanosa_bot:
+    image: bot_service
+    restart: always
+    container_name: grcanosabot
+    restart: unless-stopped
+    command: ["java","-jar","/app/grcanosabotapp.jar"]
+    environment:
+      - MONGOHOST=mongodb
 networks:
   default:
     external:

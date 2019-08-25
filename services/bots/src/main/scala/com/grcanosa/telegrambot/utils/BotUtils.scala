@@ -5,7 +5,7 @@ import java.time.{LocalDateTime, ZoneOffset}
 import com.vdurmont.emoji.EmojiParser
 import org.slf4j.LoggerFactory
 
-import scala.io.Source
+import scala.io.{BufferedSource, Source}
 import scala.util.{Random, Try}
 
 object BotUtils {
@@ -25,10 +25,21 @@ object BotUtils {
   implicit class StringHelper(s: String){
     def emojize: String = EmojiParser.parseToUnicode(s)
 
-    def getLinesAsSeq = {
+    def getFileLinesAsSeq = {
       Try {
         val buff = Source.fromFile(s)
-        val lines = buff.getLines().toSeq.map(_.emojize)
+        val lines = buff.getLines().toList.map(_.emojize)
+        buff.close
+        lines
+      }.recover{
+        case e => Seq()
+      }.get
+    }
+
+    def getResourceFileLinesAsSeq() = {
+      Try {
+        val buff: BufferedSource = Source.fromResource(s)
+        val lines= buff.getLines().toList.map(_.emojize)
         buff.close
         lines
       }.recover{
@@ -36,5 +47,7 @@ object BotUtils {
       }.get
     }
   }
+
+
 
 }

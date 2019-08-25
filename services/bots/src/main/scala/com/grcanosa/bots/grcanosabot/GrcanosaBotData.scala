@@ -10,14 +10,16 @@ object GrcanosaBotData {
 
 
   val startText = {
-    "Hola, soy el bot".emojize
+    "Hola, soy el bot de Gonzalo. Escribe /help para ver con que te puedo ayudar".emojize
   }
 
   val helpText = {
     """Esto es lo que puedo hacer:
       |/start - Imprime el mensaje de bienvenida
       |/help - Imprime esta ayuda.
-      |/cancelconversation - Cancela la conversación actual
+      |/dimealgobonito
+      |/dimealgorealmentebonito
+      |/termo15 - Añade 15 minutos a la temporizacion del termo.
     """.stripMargin.emojize
   }
 

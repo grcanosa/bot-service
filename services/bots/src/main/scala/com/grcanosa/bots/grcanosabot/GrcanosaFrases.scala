@@ -8,11 +8,13 @@ trait GrcanosaFrases {
 
   import com.grcanosa.telegrambot.utils.BotUtils._
 
-  lazy val piropos: Seq[String] = configGrcanosa.getString("bot.frases.filePiropos").getLinesAsSeq
+  val piropos: Seq[String] = configGrcanosa.getString("bot.frases.filePiropos").getResourceFileLinesAsSeq()
 
-  lazy val piroposRealmente = configGrcanosa.getString("bot.frases.filePiroposRealmente").getLinesAsSeq
+  val piroposRealmente = configGrcanosa.getString("bot.frases.filePiroposRealmente").getResourceFileLinesAsSeq()
 
-  lazy val startDayMessages = configGrcanosa.getString("bot.frases.fileStartDayMessages").getLinesAsSeq
+  val startDayMessages = configGrcanosa.getString("bot.frases.fileStartDayMessages").getResourceFileLinesAsSeq()
+
+  //piropos.foreach(p => println(s"PIROPO: $p"))
 
   def getAlgoBonito: String = {
     piropos.chooseRandom().getOrElse("")
