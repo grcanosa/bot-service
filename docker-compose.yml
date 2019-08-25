@@ -24,13 +24,14 @@ services:
   #     - --dbloc=/mnt/shared
   selenium:
     image: selenium/standalone-firefox:3.141.59-titanium
+    container_name: selenium
     volumes:
       - "/dev/shm:/dev/shm"
   renfebot:
-    image: raspberry_bot:latest
+    image: raspberry_bot_alpine:latest
     restart: always
     container_name: botsrv_renfebot
-    network_mode: host
+    #network_mode: host
     volumes:
       - "./shared/:/mnt/shared/"
       - "./src/:/code/"
