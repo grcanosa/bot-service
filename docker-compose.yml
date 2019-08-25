@@ -26,8 +26,8 @@ services:
     #image: selenium/standalone-firefox:3.141.59-titanium
     image: selenium/standalone-chrome:3.141.59-titanium
     #image: selenium/standalone-chrome-debug:3.141.59-titanium
-    ports:
-      - "5900:5900"
+    # ports:
+    #   - "5900:5900"
     container_name: selenium
     volumes:
       - "/dev/shm:/dev/shm"
