@@ -23,7 +23,8 @@ services:
   #     - --dataloc=/mnt/data/
   #     - --dbloc=/mnt/shared
   selenium:
-    image: selenium/standalone-firefox:3.141.59-titanium
+    #image: selenium/standalone-firefox:3.141.59-titanium
+    image: selenium/standalone-chrome:3.141.59-titanium
     container_name: selenium
     volumes:
       - "/dev/shm:/dev/shm"

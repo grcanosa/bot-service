@@ -33,7 +33,7 @@ def get_new_driver():
         # profile = webdriver.FirefoxProfile()
         # profile.native_events_enabled = False
         # driver = webdriver.Firefox(profile)
-        driver = webdriver.Remote(command_executor="http://selenium:4444/wd/hub",desired_capabilities=DesiredCapabilities.FIREFOX)
+        driver = webdriver.Remote(command_executor="http://selenium:4444/wd/hub",desired_capabilities=DesiredCapabilities.CHROME)
         driver.set_page_load_timeout(60)
     except Exception as e:
         logger.error("Cannot create driver")
