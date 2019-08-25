@@ -3,9 +3,9 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
-
-if __name__ != "__main__":
-    from pyvirtualdisplay import Display
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+# if __name__ != "__main__":
+#     from pyvirtualdisplay import Display
 
 import time
 import datetime
@@ -22,17 +22,18 @@ logger = logging.getLogger()
 
 
 
-if __name__ != "__main__":
-    display = Display(visible=0, size=(800, 600))
-    display.start()
+# if __name__ != "__main__":
+#     display = Display(visible=0, size=(800, 600))
+#     display.start()
 
 
 def get_new_driver():
     driver = None
     try:
-        profile = webdriver.FirefoxProfile()
-        profile.native_events_enabled = False
-        driver = webdriver.Firefox(profile)
+        # profile = webdriver.FirefoxProfile()
+        # profile.native_events_enabled = False
+        # driver = webdriver.Firefox(profile)
+        driver = webdriver.Remote(command_executor="http://localhost:4444/wd/hub",desired_capabilities=DesiredCapabilities.FIREFOX)
         driver.set_page_load_timeout(60)
     except Exception as e:
         logger.error("Cannot create driver")

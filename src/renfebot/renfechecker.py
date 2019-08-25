@@ -3,8 +3,9 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
-if __name__ != "__main__":
-    from pyvirtualdisplay import Display
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+# if __name__ != "__main__":
+#     from pyvirtualdisplay import Display
 import time
 import datetime
 
@@ -19,14 +20,16 @@ logger = logging.getLogger(__name__)
 
 class RenfeChecker:
     def __init__(self,display=True):
-        if display:
-            self._display = Display(visible=0, size=(800, 600))
-            self._display.start()
-        else:
-            self._display = None
-        self._profile = webdriver.FirefoxProfile()
-        self._profile.native_events_enabled = False
-        self.driver = webdriver.Firefox()
+        # if display:
+        #     self._display = Display(visible=0, size=(800, 600))
+        #     self._display.start()
+        # else:
+        #     self._display = None
+        # self._profile = webdriver.FirefoxProfile()
+        # self._profile.native_events_enabled = False
+        # self.driver = webdriver.Firefox()
+        self.driver = webdriver.Remote(command_executor="http://selenium:4444/wd/hub",desired_capabilities=DesiredCapabilities.FIREFOX)
+        
         self.driver.set_page_load_timeout(60)
         #self.driver.maximize_window()
         self.driver.get("http://www.renfe.com")

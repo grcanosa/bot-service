@@ -22,6 +22,10 @@ services:
   #     - grcanosabot/grcanosabot.py
   #     - --dataloc=/mnt/data/
   #     - --dbloc=/mnt/shared
+  selenium:
+    image: selenium/standalone-firefox:3.141.59-titanium
+    volumes:
+      - "/dev/shm:/dev/shm"
   renfebot:
     image: raspberry_bot:latest
     restart: always
