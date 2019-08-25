@@ -118,7 +118,7 @@
                 <version>2.4.1</version>
                 <executions>
                     <execution>
-                        <id>build-pathanalyzer</id>
+                        <id>build-grupobot</id>
                         <phase>package</phase>
                         <goals>
                             <goal>shade</goal>
@@ -145,7 +145,7 @@
                     </execution>
 
                     <execution>
-                        <id>build-pathanalyzer</id>
+                        <id>build-grcanosabot</id>
                         <phase>package</phase>
                         <goals>
                             <goal>shade</goal>
