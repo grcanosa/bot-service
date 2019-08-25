@@ -120,6 +120,18 @@ def with_new_driver(fun):
     return wrapper
 
 
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+from selenium.common.exceptions import TimeoutException
+
+def wait_for_element_by_id(driver,timeout_s, element_id):
+    try:
+        myElem = WebDriverWait(driver, timeout_s).until(EC.presence_of_element_located((By.ID, element_id)))
+        return True
+    except TimeoutException:
+        return False
+
 
 @with_new_driver
 def check_trip(driver,origin, destination, dat_go, dat_ret= None):
@@ -129,6 +141,11 @@ def check_trip(driver,origin, destination, dat_go, dat_ret= None):
     fill_elements(driver,origin, destination, dat_go, dat_ret )
     go_bt = driver.find_element_by_class_name("btn_home")
     go_bt.click()
+    if wait_for_element_by_id(driver,10,"tab-mensaje_contenido"):
+        time.sleep(1)
+    else:
+        logger.info("NO TRAINS AVAILABLE")
+        return False, "NO_TRAINS"
     if are_if_trains_available(driver):
         return True, getTrains(driver)
     else:
