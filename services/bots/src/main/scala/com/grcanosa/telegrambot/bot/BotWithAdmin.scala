@@ -144,4 +144,6 @@ with Commands{
   override def interactionDao: InteractionDao = botDao.interactionDao
 
 
+  botActor ! SendMessage(adminId,s"== WAKE UP ${this.getClass.getSimpleName} ==")
+
 }
