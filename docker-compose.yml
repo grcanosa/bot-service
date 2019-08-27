@@ -40,6 +40,7 @@ services:
       - "./shared/:/mnt/shared/"
       - "./src/:/code/"
       - "./submodules/:/submodules/" 
+      - "/etc/timezone:/etc/timezone:ro"
     entrypoint:
       - python3
       - renfebot/renfebot.py

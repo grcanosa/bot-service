@@ -41,6 +41,7 @@ class RenfeBot:
         self._DB = renfebotdb.RenfeBotDB(self._dbfile)
         userdb.initdb(self._userdbfile)
         self._install_handlers()
+        self._updater.bot.send_message(chat_id=admin_id,text="Bot is waiking up!")
 
 
     def get_trayectos_disponibles(tray):
@@ -178,7 +179,7 @@ class RenfeBot:
         self._jobQ.run_daily(self.remove_old_periodic_queries,
                                     time=datetime.time(0, 0),
                                     days=(0, 1, 2, 3, 4, 5, 6),
-                                    name="remove0800")
+                                    name="remove0000")
         self._jobQ.run_daily(self.check_periodic_queries,
                                     time=datetime.time(8, 30),
                                     days=(0, 1, 2, 3, 4, 5, 6),
