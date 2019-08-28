@@ -3,7 +3,7 @@ FROM python:3.6-alpine
 LABEL author_name Gonzalo Rodriguez
 LABEL author_email grcanosa@gmail.com
 # RUN apk add --no-cache bash curl dbus firefox-esr fontconfig ttf-freefont xvfb
-
+RUN apk add tzdata
 # ARG GECKODRIVER_VERSION=0.15.0
 # ARG GECKODRIVER_FILE=v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz
 # RUN curl -s -o /tmp/geckodriver.tar.gz -L \
