@@ -83,7 +83,7 @@ class RenfeBot:
                                  ) + class_str
                 msg += "\n"
             if exist_preferente:
-                msg += emoji.emojize(":bento_box: => Preferente.\n")
+                msg += emoji.emojize(":bento_box: -> Preferente.\n")
             if msg != "":
                 bot.send_message(chat_id=userid,
                                  text=msg,
