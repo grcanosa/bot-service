@@ -5,7 +5,7 @@ from enum import Enum
 import logging
 import os
 import argparse
-
+import emoji
 from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove)
 from telegram.ext import (Updater, CommandHandler, MessageHandler,
                           Filters, RegexHandler, ConversationHandler)
@@ -60,9 +60,19 @@ class RenfeBot:
             bot.send_message(chat_id=userid, text=TEXTS["FOUND_N_TRAINS"].
                              format(ntrains=len(trenes), origin=origin, destination=dest, date=date))
             msg = ""
+            exist_preferente = False
             for  train in trenes:
                 #logger.info(train)
-                cost_str = "{cost:.2f}".format(cost=train["PRECIO"])
+                cost_str = "{cost:6.2f}".format(cost=train["PRECIO"])
+                class_str = ""
+                if train["CLASE"].lower() == "preferente":
+                    class_str = emoji.emojize(" :bento_box:")
+                    exist_preferente = True
+                elif train["CLASE"].lower() == "turista":
+                    class_str = ""
+                else:
+                    class_str = ", C: "+train["CLASE"]
+
                 msg += TEXTS["TRAIN_INFO"].format(
                                      t_departure=train["SALIDA"].strftime(
                                          "%H:%M"),
@@ -70,8 +80,10 @@ class RenfeBot:
                                      cost=cost_str if train["PRECIO"] > 50 else "*" +
                                             cost_str + "*",
                                      ticket_type=train["TARIFA"]
-                                 )
+                                 ) + class_str
                 msg += "\n"
+            if exist_preferente:
+                msg += emoji.emojize(":bento_box: => Preferente.\n")
             if msg != "":
                 bot.send_message(chat_id=userid,
                                  text=msg,

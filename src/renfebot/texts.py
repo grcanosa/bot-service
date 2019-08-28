@@ -31,7 +31,7 @@ texts_raw = {
 "FOUND_N_TRAINS": "He encontrado {ntrains} trenes :train: con asientos disponibles para"
                     " el trayecto {origin} -> {destination} para el día {date}.",
 "NO_TRAINS_FOUND": "No hay trenes para el trayecto {origin} -> {destination} para el día {date}.",
-"TRAIN_INFO": "De {t_departure} a {t_arrival}, {cost}€, T: {ticket_type}",
+"TRAIN_INFO": "{t_departure}->{t_arrival}, {cost}€, T: {ticket_type}",
 "DB_QUERY_ALREADY": "La consulta periódica ya había sido añadida previamente.",
 "DB_QUERY_INSERTED": "La consulta periódica ha sido añadida.",
 "DB_QUERY_REMOVED" : "La consulta ha sido eliminada.",
