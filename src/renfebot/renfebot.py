@@ -27,6 +27,8 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+turista_plus=":heavy_plus_sign:"
+preferente=":bento_box:"
 
 class RenfeBot:
     def __init__(self, token, admin_id, dbpath):
@@ -60,14 +62,17 @@ class RenfeBot:
             bot.send_message(chat_id=userid, text=TEXTS["FOUND_N_TRAINS"].
                              format(ntrains=len(trenes), origin=origin, destination=dest, date=date))
             msg = ""
-            exist_preferente = False
+            add_legend = False
             for  train in trenes:
                 #logger.info(train)
                 cost_str = "{cost:6.2f}".format(cost=train["PRECIO"])
                 class_str = ""
                 if train["CLASE"].lower() == "preferente":
-                    class_str = emoji.emojize(" :bento_box:")
-                    exist_preferente = True
+                    class_str = emoji.emojize(preferente)
+                    add_legend = True
+                elif train["CLASE"].lower() == "turista plus":
+                    class_str = emoji.emojize(turista_plus)
+                    add_legend = True
                 elif train["CLASE"].lower() == "turista":
                     class_str = ""
                 else:
@@ -82,8 +87,9 @@ class RenfeBot:
                                      ticket_type=train["TARIFA"]
                                  ) + class_str
                 msg += "\n"
-            if exist_preferente:
-                msg += emoji.emojize(":bento_box: -> Preferente.\n")
+            if add_legend:
+                msg += emoji.emojize(turista_plus+" - Turista Plus\n")
+                msg += emoji.emojize(preferente +" - Preferente.\n")
             if msg != "":
                 bot.send_message(chat_id=userid,
                                  text=msg,
