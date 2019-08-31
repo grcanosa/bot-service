@@ -91,6 +91,7 @@ class RenfeBot:
                 msg += emoji.emojize(turista_plus+" : Turista Plus\n")
                 msg += emoji.emojize(preferente +" : Preferente.\n")
             if msg != "":
+                logger.info(msg)
                 bot.send_message(chat_id=userid,
                                  text=msg,
                                  parse_mode=ParseMode.MARKDOWN)
@@ -163,7 +164,7 @@ class RenfeBot:
         queriesDF = self._DB.get_queries_DF()
         bot.send_message(chat_id=self._admin_id, text="Not ready yet!")
 
-    def _check_now(self):
+    def _check_now(self,bot,update):
         queries = self._DB.get_queries()
         for q in queries:
             date = self._DB.timestamp_to_date(q["date"])
