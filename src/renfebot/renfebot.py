@@ -76,7 +76,7 @@ class RenfeBot:
                 elif train["CLASE"].lower() == "turista":
                     class_str = ""
                 elif "plaza H" in train["CLASE"]:
-                    class_str = emoji.emojize(":wheelchair:")
+                    class_str = emoji.emojize(" :wheelchair_symbol:")
                 else:
                     class_str = ", C: `"+train["CLASE"]+"`"
 
