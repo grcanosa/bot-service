@@ -90,8 +90,8 @@ class RenfeBot:
                                  ) + class_str
                 msg += "\n"
             if add_legend:
-                msg += emoji.emojize(turista_plus+" : Turista Plus\n")
-                msg += emoji.emojize(preferente +" : Preferente.\n")
+                msg += emoji.emojize(turista_plus+" - Turista Plus\n")
+                msg += emoji.emojize(preferente +" - Preferente.\n")
             if msg != "":
                 logger.info(msg)
                 bot.send_message(chat_id=userid,
