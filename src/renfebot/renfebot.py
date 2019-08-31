@@ -88,8 +88,8 @@ class RenfeBot:
                                  ) + class_str
                 msg += "\n"
             if add_legend:
-                msg += emoji.emojize(turista_plus+" - Turista Plus\n")
-                msg += emoji.emojize(preferente +" - Preferente.\n")
+                msg += emoji.emojize(turista_plus+" : Turista Plus\n")
+                msg += emoji.emojize(preferente +" : Preferente.\n")
             if msg != "":
                 bot.send_message(chat_id=userid,
                                  text=msg,
@@ -163,6 +163,14 @@ class RenfeBot:
         queriesDF = self._DB.get_queries_DF()
         bot.send_message(chat_id=self._admin_id, text="Not ready yet!")
 
+    def _check_now(self):
+        queries = self._DB.get_queries()
+        for q in queries:
+            date = self._DB.timestamp_to_date(q["date"])
+            res = RENFECHECKER.check_trip(q["origin"], q["destination"], date)
+            self.send_query_results_to_user(bot, q["userid"], res,
+                                                 q["origin"], q["destination"], date)
+
     def _install_handlers(self):
         self._conv_handler = ConversationHandler(
             entry_points=[CommandHandler('start', self._CV.handler_start)],
@@ -175,6 +183,7 @@ class RenfeBot:
             fallbacks=[CommandHandler('cancel', self._CV.handler_cancel)]
         )
         self._updater.dispatcher.add_handler(self._conv_handler)
+        self._updater.dispatcher.add_handler(CommandHandler("checknow",self._check_now))
         self._updater.dispatcher.add_handler(CommandHandler("admin",
                                                             self._h_admin_access,
                                                             pass_args=True))
