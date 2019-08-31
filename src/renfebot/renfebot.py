@@ -75,8 +75,10 @@ class RenfeBot:
                     add_legend = True
                 elif train["CLASE"].lower() == "turista":
                     class_str = ""
+                elif "plaza H" in train["CLASE"]:
+                    class_str = emoji.emojize(":wheelchair:")
                 else:
-                    class_str = ", C: "+train["CLASE"]
+                    class_str = ", C: `"+train["CLASE"]+"`"
 
                 msg += TEXTS["TRAIN_INFO"].format(
                                      t_departure=train["SALIDA"].strftime(
