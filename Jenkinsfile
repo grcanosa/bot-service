@@ -20,6 +20,21 @@ pipeline {
           }
         }
 
+        stage('lk') {
+          steps {
+            timestamps() {
+              sh 'echo "hola"'
+            }
+
+          }
+        }
+
+      }
+    }
+
+    stage('ttt') {
+      steps {
+        sleep 3
       }
     }
 
