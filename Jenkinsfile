@@ -10,7 +10,7 @@ pipeline {
       parallel {
         stage('build') {
           steps {
-            sh 'maven --version'
+            sh 'mvn --version'
           }
         }
 
