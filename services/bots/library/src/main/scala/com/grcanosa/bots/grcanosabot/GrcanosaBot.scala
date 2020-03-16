@@ -47,17 +47,19 @@ object GrcanosaBot extends AkkaDefaults{
 }
 
 
-class GrcanosaBot(override val token: String,override val adminId: Long, val homeAssistantToken: String)
+class GrcanosaBot(override val token: String
+                  , override val adminId: Long
+                  , val homeAssistantToken: String)
                  (implicit botDao: BotDao)
   extends BotWithAdmin(token,adminId)
-with GrcanosaFrases
-with HomeAssistant {
+    with GrcanosaFrases
+    with HomeAssistant {
 
   //override val homeAssistantToken = homeAssistantTokenIn
 
   import GrcanosaBotData._
 
-  val grcanosaBotActor = system.actorOf(Props(new GrcanosaBotActor()))
+  val grcanosaBotActor: ActorRef = system.actorOf(Props(new GrcanosaBotActor()))
 
 
   Source.tick(0 seconds, 1 minute,"msg").runForeach{ _ => {
@@ -88,10 +90,6 @@ with HomeAssistant {
       }
     }
   }
-
-
-
-
 
   class GrcanosaBotActor extends Actor{
     def receive = {
