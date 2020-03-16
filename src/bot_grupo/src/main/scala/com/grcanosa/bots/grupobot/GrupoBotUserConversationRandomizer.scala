@@ -3,7 +3,6 @@ package com.grcanosa.bots.grupobot
 import java.time.LocalDateTime
 
 import akka.actor.Cancellable
-import com.grcanosa.bots.grupobot.model.Conversation
 import com.grcanosa.telegrambot.bot.user.{UserHandler, UserRegistry}
 import com.grcanosa.telegrambot.model.BotUser.PERMISSION_ALLOWED
 

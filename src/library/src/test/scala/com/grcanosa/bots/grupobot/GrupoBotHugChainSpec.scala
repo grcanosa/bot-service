@@ -1,7 +1,6 @@
 package com.grcanosa.bots.grupobot
 
 import akka.actor.ActorRef
-import com.grcanosa.bots.grupobot.GrupoBotHugChain.HugChain
 import com.grcanosa.telegrambot.bot.user.UserHandler
 import com.grcanosa.telegrambot.model.BotUser
 import com.grcanosa.telegrambot.model.BotUser.PERMISSION_ALLOWED

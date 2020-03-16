@@ -20,8 +20,6 @@ object GrcanosaBot extends AkkaDefaults{
   case object StartDayMessage
   case object DimeAlgoRealmenteBonito
 
-  import com.grcanosa.bots.grcanosabot.utils.GrcanosaBotUtils._
-
   val token = configGrcanosa.getString("bot.token")
   val adminId = configGrcanosa.getLong("bot.adminId")
 

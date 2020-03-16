@@ -4,8 +4,6 @@ import scala.io.Source
 
 trait GrcanosaFrases {
 
-  import com.grcanosa.bots.grcanosabot.utils.GrcanosaBotUtils._
-
   import com.grcanosa.telegrambot.utils.BotUtils._
 
   val piropos: Seq[String] = configGrcanosa.getString("bot.frases.filePiropos").getResourceFileLinesAsSeq()

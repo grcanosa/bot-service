@@ -7,8 +7,6 @@ import com.bot4s.telegram.api.AkkaDefaults
 import com.bot4s.telegram.api.declarative.Callbacks
 import com.bot4s.telegram.methods.{EditMessageReplyMarkup, ForwardMessage, SendMessage}
 import com.bot4s.telegram.models.{ChatId, InlineKeyboardMarkup, Message}
-import com.grcanosa.bots.grupobot.dao.{ConversationDao, WordCountDao}
-import com.grcanosa.bots.grupobot.model.Conversation
 import com.grcanosa.telegrambot.bot.BotWithAdmin
 import com.grcanosa.telegrambot.bot.BotWithAdmin.ForwardMessageTo
 import com.grcanosa.telegrambot.bot.user.UserHandler
@@ -22,7 +20,6 @@ import scala.concurrent.duration._
 import scala.util.{Success, Try}
 
 object GrupoBot extends AkkaDefaults {
-  import com.grcanosa.bots.grupobot.utils.GrupoUtils._
 
   val token = configGrupo.getString("bot.token")
   val adminId = configGrupo.getLong("bot.adminId")

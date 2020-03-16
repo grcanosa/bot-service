@@ -1,7 +1,5 @@
 package com.grcanosa.bots.grupobot
 
-import com.grcanosa.bots.grupobot.GrupoBotHugChain.HugChain
-import com.grcanosa.bots.grupobot.utils.GrupoUtils
 import com.grcanosa.telegrambot.bot.user.UserHandler
 import com.vdurmont.emoji.EmojiParser
 

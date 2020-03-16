@@ -4,8 +4,6 @@ object GrcanosaBotData {
 
   import com.grcanosa.telegrambot.utils.BotUtils._
 
-  import com.grcanosa.bots.grcanosabot.utils.GrcanosaBotUtils._
-
   val saraId = configGrcanosa.getLong("bot.saraId")
 
 

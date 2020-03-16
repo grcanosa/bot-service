@@ -1,7 +1,5 @@
 package com.grcanosa.bots.grupobot.dao
 
-import com.grcanosa.bots.grupobot.dao.ConversationDao.ConversationMongo
-import com.grcanosa.bots.grupobot.model.Conversation
 import com.grcanosa.telegrambot.dao.mongo.MongoResultsMappings
 import org.mongodb.scala.{MongoClient, MongoCollection}
 import org.mongodb.scala.bson.codecs.Macros._
