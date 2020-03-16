@@ -1,6 +1,6 @@
 #!/bin/bash
 
 
-./tools/stop.sh
+./devops/tools/stop.sh
 
-./tools/run.sh
+./devops/tools/run.sh

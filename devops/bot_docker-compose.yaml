@@ -1,23 +1,21 @@
 version: '3'
 services:
   grupo_bot:
-    image: bot_service
-    restart: always
+    image: grupobot
     container_name: grupobot
     volumes:
       - "/etc/timezone:/etc/timezone:ro"
     restart: unless-stopped
-    command: ["java","-jar","/app/grupobotapp.jar"]
+    command: ["java","-jar","/app/bot.jar"]
     environment:
       - MONGOHOST=mongodb
   grcanosa_bot:
-    image: bot_service
-    restart: always
+    image: grcanosabot
     container_name: grcanosabot
     restart: unless-stopped
     volumes:
       - "/etc/timezone:/etc/timezone:ro"
-    command: ["java","-jar","/app/grcanosabotapp.jar"]
+    command: ["java","-jar","/app/bot.jar"]
     environment:
       - MONGOHOST=mongodb
 networks:
