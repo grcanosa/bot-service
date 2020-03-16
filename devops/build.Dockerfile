@@ -19,16 +19,14 @@ RUN dpkg -i sbt-${SBT_VERSION}.deb && \
 
 #COMPILE PROJECT
 WORKDIR /build
-COPY build.sbt /build/
+COPY *.sbt /build/
 COPY project/*.sbt /build/project/
 COPY project/*.scala /build/project/
 RUN sbt update
 
-COPY src /build/
+ADD src /build/src/
 RUN sbt compile assembly
 
-#ARG BOT
-#
-#FROM openjdk:${OPENJDK_TAG}
-#
-#COPY --from=build /build/src/${BOT}/target/scala-2.12/*assembly.jar /app/bot.jar
+FROM openjdk:${OPENJDK_TAG}
+
+COPY --from=build /build/src/bot_apps/target/scala-2.12/*assembly.jar /app/bot.jar

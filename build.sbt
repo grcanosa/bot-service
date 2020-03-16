@@ -15,7 +15,8 @@ lazy val root = project
     library,
     bot_grcanosa,
     bot_grupo,
-    bot_renfe
+    bot_renfe,
+    bot_apps
   )
 
 lazy val library = project
@@ -32,15 +33,9 @@ lazy val library = project
 lazy val bot_grcanosa = project
   .in(file("src/bot_grcanosa"))
   .enablePlugins(PackagingTypePlugin)
-  .enablePlugins(AssemblyPlugin)
+  .disablePlugins(AssemblyPlugin)
   .settings(
-    name := "bot_grcanosa",
-    assemblySettings,
-    artifact in (Compile, assembly):= {
-      val art = (artifact in (Compile, assembly)).value
-      art.withClassifier(Some("assembly"))
-    },
-    addArtifact(artifact in (Compile, assembly), assembly)
+    name := "bot_grcanosa"
   )
   .dependsOn(
     library
@@ -51,15 +46,9 @@ lazy val bot_grcanosa = project
 lazy val bot_grupo = project
   .in(file("src/bot_grupo"))
   .enablePlugins(PackagingTypePlugin)
-  .enablePlugins(AssemblyPlugin)
+  .disablePlugins(AssemblyPlugin)
   .settings(
-    name := "bot_grupo",
-    assemblySettings,
-    artifact in (Compile, assembly):= {
-      val art = (artifact in (Compile, assembly)).value
-      art.withClassifier(Some("assembly"))
-    },
-    addArtifact(artifact in (Compile, assembly), assembly)
+    name := "bot_grupo"
   )
   .dependsOn(
     library
@@ -70,9 +59,20 @@ lazy val bot_grupo = project
 lazy val bot_renfe = project
   .in(file("src/bot_renfe"))
   .enablePlugins(PackagingTypePlugin)
+  .disablePlugins(AssemblyPlugin)
+  .settings(
+    name := "bot_renfe"
+  )
+  .dependsOn(
+    library
+  )
+
+lazy val bot_apps = project
+  .in(file("src/bot_apps"))
+  .enablePlugins(PackagingTypePlugin)
   .enablePlugins(AssemblyPlugin)
   .settings(
-    name := "bot_renfe",
+    name := "bot_apps",
     assemblySettings,
     artifact in (Compile, assembly):= {
       val art = (artifact in (Compile, assembly)).value
@@ -81,9 +81,9 @@ lazy val bot_renfe = project
     addArtifact(artifact in (Compile, assembly), assembly)
   )
   .dependsOn(
-    library
+     bot_grcanosa
+    , bot_grupo
   )
-
 
 val telegramBotVersion = "4.0.0-RC2"
 val seleniumVersion = "3.141.59"
@@ -97,7 +97,8 @@ val libDeps = Seq(
     "org.seleniumhq.selenium" % "selenium-remote-driver" % seleniumVersion,
     "com.github.etaty" %% "rediscala" % "1.9.0",
     "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
-    "io.spray" %% "spray-json" % "1.3.5"
+    "io.spray" %% "spray-json" % "1.3.5",
+    "ch.qos.logback" % "logback-classic" % "1.1.7"
 )
 
 // val sparkVersion = "2.3.0"
@@ -148,7 +149,7 @@ val libDeps = Seq(
 
 
 lazy val assemblySettings = Seq(
-assemblyJarName in assembly := s"${name.value}_${scalaVersion.value}-${version.value}-assembly.jar",
+assemblyJarName in assembly := s"${name.value}_${scalaBinaryVersion.value}-${version.value}-assembly.jar",
 // Skip the tests (comment out to run the tests).
 test in assembly := {},
 
