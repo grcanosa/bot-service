@@ -3,13 +3,12 @@ package com.grcanosa.telegrambot.dao.mongo
 
 import com.grcanosa.telegrambot.dao.BotUserDao
 import com.grcanosa.telegrambot.model.BotUser
-import com.grcanosa.telegrambot.model.BotUser.BotUserPermission
+import com.grcanosa.telegrambot.utils.LazyBotLogging
 import com.mongodb.client.result.UpdateResult
-import org.mongodb.scala.{Completed, FindObservable, MongoClient, MongoCollection, SingleObservable, result}
 import org.mongodb.scala.model.Filters._
+import org.mongodb.scala.{MongoClient, MongoCollection, SingleObservable}
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Try
 
 
 class BotUserMongoDao(val host: String
@@ -18,9 +17,8 @@ class BotUserMongoDao(val host: String
                      (implicit val executionContext: ExecutionContext)
 extends BotUserDao
 with MongoCodecs
-with MongoResultsMappings {
-
-  import com.grcanosa.telegrambot.utils.BotUtils._
+with MongoResultsMappings
+with LazyBotLogging{
 
 
 
@@ -32,7 +30,7 @@ with MongoResultsMappings {
 
 
   override def getUsers(): Future[Seq[BotUser]] = {
-      BOTLOG.info("Getting all users")
+      botlog.info("Getting all users")
       users.find().toFuture().map(_.map(fromBotUserMongo))
   }
 

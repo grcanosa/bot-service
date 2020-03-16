@@ -1,24 +1,21 @@
 package com.grcanosa.telegrambot.bot
 
 import akka.actor.{Actor, Props}
-import com.bot4s.telegram.api.{AkkaDefaults, Polling, TelegramBot}
 import com.bot4s.telegram.api.declarative.{Commands, Messages}
+import com.bot4s.telegram.api.{AkkaDefaults, Polling, TelegramBot}
 import com.bot4s.telegram.clients.AkkaHttpClient
-import com.bot4s.telegram.methods.{MultipartRequest, SendAnimation, SendAudio, SendMessage, SendPhoto, SendVideo, SendVideoNote, SendVoice}
+import com.bot4s.telegram.methods._
 import com.bot4s.telegram.models.{InputFile, Message}
 import com.grcanosa.telegrambot.bot.BotWithAdmin.ForwardMessageTo
 import com.grcanosa.telegrambot.bot.user.UserHandler
-import com.grcanosa.telegrambot.dao.{BotDao, BotUserDao, InteractionDao}
+import com.grcanosa.telegrambot.dao.{BotDao, InteractionDao}
 import com.grcanosa.telegrambot.model.BotUser.{PERMISSION_ALLOWED, PERMISSION_NOT_ALLOWED}
+
 
 
 object BotWithAdmin{
   case class ForwardMessageTo(chatId: Long, message: Message)
 }
-
-
-
-
 
 
 
@@ -33,9 +30,8 @@ with Messages
 with BotUsersWithAdmin
 with BotResponses
 with BotKeyboards
-with Commands{
-
-  import com.grcanosa.telegrambot.utils.BotUtils._
+with Commands
+{
 
   override val client = new AkkaHttpClient(token)
 
@@ -46,7 +42,7 @@ with Commands{
   }
 
   override def userRequestPermission(userH: UserHandler): Unit = {
-    BOTLOG.info(s"User ${userH.user.id} requests permission")
+    logger.info(s"User ${userH.user.id} requests permission")
     botActor ! SendMessage(userH.user.id, userRequestPermissionResponse(userH.user.name))
     val keyboard = permissionKeyboard(userH.user)
     botActor ! SendMessage(adminId,
@@ -66,7 +62,7 @@ with Commands{
   onCommand("/users") { implicit msg =>
     isAdmin{ _ =>
       val msg = userHandlers.values.toSeq.map{ uh =>
-        BOTLOG.info(s"User Handler is $uh")
+        logger.info(s"User Handler is $uh")
         s"${uh.user.id};${uh.user.name};${uh.user.permission}"
       }.mkString("\n")
       botActor ! SendMessage(adminId,msg)

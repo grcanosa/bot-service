@@ -16,6 +16,9 @@ import scala.concurrent.duration._
 import com.grcanosa.telegrambot.utils.BotUtils.BOTLOG
 
 object GrcanosaBot extends AkkaDefaults{
+
+  import com.grcanosa.bots.grcanosabot.utils.GrcanosaBotUtils._
+
   case object DimeAlgoBonito
   case object StartDayMessage
   case object DimeAlgoRealmenteBonito

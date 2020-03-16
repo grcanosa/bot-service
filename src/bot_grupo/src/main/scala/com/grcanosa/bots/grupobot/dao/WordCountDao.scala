@@ -1,5 +1,6 @@
 package com.grcanosa.bots.grupobot.dao
 
+import com.grcanosa.bots.grupobot.model.WordCount
 import com.grcanosa.telegrambot.dao.mongo.MongoResultsMappings
 import org.bson.codecs.configuration.CodecRegistries.{fromProviders, fromRegistries}
 import org.mongodb.scala.bson.codecs.DEFAULT_CODEC_REGISTRY

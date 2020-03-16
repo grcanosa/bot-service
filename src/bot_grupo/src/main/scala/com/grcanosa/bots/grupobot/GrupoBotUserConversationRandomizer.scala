@@ -2,11 +2,12 @@ package com.grcanosa.bots.grupobot
 
 import java.time.LocalDateTime
 
-import akka.actor.Cancellable
+import com.grcanosa.bots.grupobot.model.Conversation
 import com.grcanosa.telegrambot.bot.user.{UserHandler, UserRegistry}
 import com.grcanosa.telegrambot.model.BotUser.PERMISSION_ALLOWED
+import com.grcanosa.telegrambot.utils.LazyBotLogging
 
-trait GrupoBotUserConversationRandomizer extends UserRegistry {
+trait GrupoBotUserConversationRandomizer extends UserRegistry with LazyBotLogging {
 
   import com.grcanosa.telegrambot.utils.BotUtils._
 
@@ -42,14 +43,14 @@ trait GrupoBotUserConversationRandomizer extends UserRegistry {
   }
 
   def assignNewConversation(userH: UserHandler) = {
-    BOTLOG.info(s"Assigning new conversation to user: ${userH.user.name}")
+    botlog.info(s"Assigning new conversation to user: ${userH.user.name}")
     rwLock.synchronized {
       val destUH = getUsersWithNoConversations2()
         .filter(uh => uh.user.id != userH.user.id)
         .chooseRandom()
 
       destUH.map { duh =>
-        BOTLOG.info(s"Conversation assigned to ${duh.user.name}")
+        botlog.info(s"Conversation assigned to ${duh.user.name}")
         val conv = Conversation(userH, duh, None, LocalDateTime.now().toString, LocalDateTime.now().toString)
         userConversations = conv +: userConversations
         newConversation(conv)

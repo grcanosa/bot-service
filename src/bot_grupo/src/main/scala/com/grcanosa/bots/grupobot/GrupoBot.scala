@@ -2,36 +2,34 @@ package com.grcanosa.bots.grupobot
 
 import java.time.LocalDateTime
 
-import akka.actor.{Actor, ActorRef, Cancellable, Props}
+import akka.actor.{Actor, ActorRef, Props}
 import com.bot4s.telegram.api.AkkaDefaults
 import com.bot4s.telegram.api.declarative.Callbacks
-import com.bot4s.telegram.methods.{EditMessageReplyMarkup, ForwardMessage, SendMessage}
-import com.bot4s.telegram.models.{ChatId, InlineKeyboardMarkup, Message}
+import com.bot4s.telegram.methods.{EditMessageReplyMarkup, SendMessage}
+import com.bot4s.telegram.models.{ChatId, Message}
+import com.grcanosa.bots.grupobot.dao.{ConversationDao, WordCountDao}
+import com.grcanosa.bots.grupobot.utils.GrupoUtils
 import com.grcanosa.telegrambot.bot.BotWithAdmin
 import com.grcanosa.telegrambot.bot.BotWithAdmin.ForwardMessageTo
-import com.grcanosa.telegrambot.bot.user.UserHandler
-import com.grcanosa.telegrambot.dao.{BotDao, BotUserDao, InteractionDao}
 import com.grcanosa.telegrambot.dao.mongo.{BotUserMongoDao, InteractionMongoDao}
-import com.grcanosa.telegrambot.dao.redis.BotUserRedisDao
+import com.grcanosa.telegrambot.dao.{BotDao, BotUserDao, InteractionDao}
 import com.grcanosa.telegrambot.model.BotUser
-import com.grcanosa.telegrambot.model.BotUser.PERMISSION_ALLOWED
 
-import scala.concurrent.duration._
-import scala.util.{Success, Try}
+import scala.util.Try
 
 object GrupoBot extends AkkaDefaults {
 
-  val token = configGrupo.getString("bot.token")
-  val adminId = configGrupo.getLong("bot.adminId")
+  val token = GrupoUtils.configGrupo.getString("bot.token")
+  val adminId = GrupoUtils.configGrupo.getLong("bot.adminId")
 
 //  val redisHost = config.getString("redis.host")
 //  val redisPort = config.getInt("redis.port")
 //  val redisBaseKey = config.getString("bot.redis.keybase")
 //  val redisUserDao = new BotUserRedisDao(redisHost,redisPort,redisBaseKey)
 
-  val mongoHost = configGrupo.getString("mongo.host")
-  val mongoPort = configGrupo.getInt("mongo.port")
-  val mongoDatabaseName = configGrupo.getString("bot.mongo.databasename")
+  val mongoHost = GrupoUtils.configGrupo.getString("mongo.host")
+  val mongoPort = GrupoUtils.configGrupo.getInt("mongo.port")
+  val mongoDatabaseName = GrupoUtils.configGrupo.getString("bot.mongo.databasename")
 
   implicit val ec = system.dispatcher
 

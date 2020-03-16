@@ -10,7 +10,7 @@ import scala.util.{Random, Try}
 
 object BotUtils {
 
-  val BOTLOG  = LoggerFactory.getLogger("botloggger")
+  //val BOTLOG  = LoggerFactory.getLogger("botloggger")
 
   val random = new Random(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC))
 
