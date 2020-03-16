@@ -1,6 +1,7 @@
-package com.grcanosa.bots.grupobot
+package com.grcanosa.bots.grupobot.baile
 
 import com.grcanosa.bots.grupobot.GrupoBotHugChain.HugChain
+import com.grcanosa.bots.grupobot.utils.GrupoUtils
 import com.grcanosa.telegrambot.bot.user.UserHandler
 import com.grcanosa.telegrambot.utils.LazyBotLogging
 import com.vdurmont.emoji.EmojiParser
@@ -9,17 +10,16 @@ import scala.annotation.tailrec
 import scala.concurrent.duration._
 import scala.util.Try
 
-object GrupoBotData extends LazyBotLogging{
+object GrupoBotBaileData extends LazyBotLogging{
 
-  import com.grcanosa.telegrambot.utils.BotUtils._
-  import com.grcanosa.bots.grupobot.utils.GrupoUtils._
+    import com.grcanosa.telegrambot.utils.BotUtils._
 
   implicit class BotStrings(s: String){
     def bottext: String = EmojiParser.parseToUnicode(":robot_face::speech_balloon: "+s)
   }
 
 
-  val conversationDuration = Try{configGrupoOlmo.getInt("grupobot.conversation.minutes")}.getOrElse(15) minutes
+  val conversationDuration = Try{GrupoUtils.configBaileGrupo.getInt("grupobot.conversation.minutes")}.getOrElse(15) minutes
 
   botlog.info(s"Conversation set to last $conversationDuration")
 
@@ -41,7 +41,7 @@ object GrupoBotData extends LazyBotLogging{
 
   val startText = {
     List(
-      "Hola, soy el bot de Los del Olmo :deciduous_tree:. Mi propósito es conectarte aleatoriamente con otros miembros del grupo."
+      "Hola, soy el bot de la cuarentena. Mi propósito es conectarte aleatoriamente con otros miembros del grupo."
       ,s"""Cada vez que escribas al bot enviaré tus mensajes aleatoriamente a otro miembro del grupo.
          | Ninguno de los dos sabrá quién es el otro (excepto que os lo digáis, claro).
          | Si ella/él te contesta, sus mensajes te llegarán a ti. Diez minutos después de que os intercambiéis el

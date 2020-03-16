@@ -25,7 +25,8 @@ lazy val library = project
   .disablePlugins(AssemblyPlugin)
   .settings(
     name := "telegrambot",
-    libraryDependencies ++= libDeps
+    libraryDependencies ++= libDeps,
+    libraryDependencies ++= testDeps
   )
 
 
@@ -35,7 +36,8 @@ lazy val bot_grcanosa = project
   .enablePlugins(PackagingTypePlugin)
   .disablePlugins(AssemblyPlugin)
   .settings(
-    name := "bot_grcanosa"
+    name := "bot_grcanosa",
+    libraryDependencies ++= testDeps
   )
   .dependsOn(
     library
@@ -48,7 +50,8 @@ lazy val bot_grupo = project
   .enablePlugins(PackagingTypePlugin)
   .disablePlugins(AssemblyPlugin)
   .settings(
-    name := "bot_grupo"
+    name := "bot_grupo",
+    libraryDependencies ++= testDeps
   )
   .dependsOn(
     library
@@ -61,7 +64,8 @@ lazy val bot_renfe = project
   .enablePlugins(PackagingTypePlugin)
   .disablePlugins(AssemblyPlugin)
   .settings(
-    name := "bot_renfe"
+    name := "bot_renfe",
+    libraryDependencies ++= testDeps
   )
   .dependsOn(
     library
@@ -87,6 +91,7 @@ lazy val bot_apps = project
 
 val telegramBotVersion = "4.0.0-RC2"
 val seleniumVersion = "3.141.59"
+val akkaVersion = "2.5.30"
 
 val libDeps = Seq(
     "com.vdurmont" % "emoji-java" % "4.0.0",
@@ -98,7 +103,14 @@ val libDeps = Seq(
     "com.github.etaty" %% "rediscala" % "1.9.0",
     "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
     "io.spray" %% "spray-json" % "1.3.5",
-    "ch.qos.logback" % "logback-classic" % "1.1.7"
+    "ch.qos.logback" % "logback-classic" % "1.1.7",
+    "com.typesafe.akka" %% "akka-actor" % akkaVersion,
+  "com.typesafe.akka" %% "akka-stream" % akkaVersion,
+  "com.typesafe.akka" %% "akka-protobuf" % akkaVersion
+)
+
+val testDeps = Seq(
+  "org.scalatest" %% "scalatest" % "3.1.1" % "test"
 )
 
 // val sparkVersion = "2.3.0"

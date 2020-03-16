@@ -3,3 +3,4 @@ src/grcanosabot/secret.py filter=crypt diff=crypt
 src/renfebot/secret.py filter=crypt diff=crypt
 src/twitterbot/twitterapi.py filter=crypt diff=crypt
 services/bots/src/main/resources/*.conf  filter=crypt diff=crypt
+src/bot_apps/src/main/resources/*.conf  filter=crypt diff=crypt

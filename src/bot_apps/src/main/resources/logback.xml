@@ -28,9 +28,10 @@
         </encoder>
     </appender>
 
-    <logger name="q60logger" level="info" additivity="false">
-        <appender-ref ref="STDOUT" />
-    </logger>
+<!--    <logger name="q60logger" level="info" additivity="false">-->
+<!--        <appender-ref ref="STDOUT" />-->
+<!--    </logger>-->
+        <logger name="org.mongodb" level="off" additivity="false"> </logger>
 
     <root level="info">
         <appender-ref ref="STDOUT" />

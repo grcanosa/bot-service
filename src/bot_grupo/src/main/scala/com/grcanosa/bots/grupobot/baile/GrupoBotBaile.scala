@@ -1,4 +1,4 @@
-package com.grcanosa.bots.grupobot
+package com.grcanosa.bots.grupobot.baile
 
 import java.time.LocalDateTime
 
@@ -10,27 +10,28 @@ import com.bot4s.telegram.models.{ChatId, Message}
 import com.grcanosa.bots.grupobot.dao.{ConversationDao, WordCountDao}
 import com.grcanosa.bots.grupobot.model.Conversation
 import com.grcanosa.bots.grupobot.utils.GrupoUtils
+import com.grcanosa.bots.grupobot.{GrupoBotData, GrupoBotHugChain, GrupoBotUserConversationRandomizer}
 import com.grcanosa.telegrambot.bot.BotWithAdmin
 import com.grcanosa.telegrambot.bot.BotWithAdmin.ForwardMessageTo
-import com.grcanosa.telegrambot.dao.mongo.{BotUserMongoDao, InteractionMongoDao}
 import com.grcanosa.telegrambot.dao.{BotDao, BotUserDao, InteractionDao}
+import com.grcanosa.telegrambot.dao.mongo.{BotUserMongoDao, InteractionMongoDao}
 import com.grcanosa.telegrambot.model.BotUser
 
 import scala.util.Try
 
-object GrupoBot extends AkkaDefaults {
+object GrupoBotBaile extends AkkaDefaults{
 
-  val token = GrupoUtils.configGrupoOlmo.getString("bot.token")
-  val adminId = GrupoUtils.configGrupoOlmo.getLong("bot.adminId")
+  val token = GrupoUtils.configBaileGrupo.getString("bot.token")
+  val adminId = GrupoUtils.configBaileGrupo.getLong("bot.adminId")
 
-//  val redisHost = config.getString("redis.host")
-//  val redisPort = config.getInt("redis.port")
-//  val redisBaseKey = config.getString("bot.redis.keybase")
-//  val redisUserDao = new BotUserRedisDao(redisHost,redisPort,redisBaseKey)
+  //  val redisHost = config.getString("redis.host")
+  //  val redisPort = config.getInt("redis.port")
+  //  val redisBaseKey = config.getString("bot.redis.keybase")
+  //  val redisUserDao = new BotUserRedisDao(redisHost,redisPort,redisBaseKey)
 
-  val mongoHost = GrupoUtils.configGrupoOlmo.getString("mongo.host")
-  val mongoPort = GrupoUtils.configGrupoOlmo.getInt("mongo.port")
-  val mongoDatabaseName = GrupoUtils.configGrupoOlmo.getString("bot.mongo.databasename")
+  val mongoHost = GrupoUtils.configBaileGrupo.getString("mongo.host")
+  val mongoPort = GrupoUtils.configBaileGrupo.getInt("mongo.port")
+  val mongoDatabaseName = GrupoUtils.configBaileGrupo.getString("bot.mongo.databasename")
 
   implicit val ec = system.dispatcher
 
@@ -49,16 +50,10 @@ object GrupoBot extends AkkaDefaults {
 
   val wordCountDao = new WordCountDao(mongoHost,mongoPort,mongoDatabaseName)
 
-  val grupoBot = new GrupoBot(token,adminId,conversationDao,wordCountDao)
-
-
+  val grupoBot = new GrupoBotBaile(token,adminId,conversationDao,wordCountDao)
 }
 
-
-
-
-
-class GrupoBot(override val token: String,
+class GrupoBotBaile(override val token: String,
                override val adminId:Long,
                val conversationDao: ConversationDao,
                val wordCountDao: WordCountDao
@@ -66,11 +61,10 @@ class GrupoBot(override val token: String,
               (implicit botDao: BotDao)
 extends BotWithAdmin(token, adminId)
 with GrupoBotUserConversationRandomizer
-with GrupoBotHugChain
+//with GrupoBotHugChain
 with Callbacks{
 
-  import GrupoBotData._
-  import com.grcanosa.telegrambot.utils.BotUtils._
+  import GrupoBotBaileData._
 
   val grupoBotActor = system.actorOf(Props(new GrupoBotActor()))
 
@@ -88,38 +82,38 @@ with Callbacks{
     }
   }
 //
-  onCommand("/cadenadeabrazos"){ implicit msg =>
-    allowedUser(Some("cadenaabrazos")) { uH =>
-      val hugChain = newHugChain(uH)
-      val (txt,keyboard) = GrupoBotHugChain.getHugChainMessage(hugChain,permittedUserHandlers)
-      reply(txt,replyMarkup = keyboard)
-    }
-  }
-
-  onCallbackWithTag(hugChainCallbackDataKeyword){ implicit cbk =>
-    processHugChainCallbackData(cbk.message,cbk.data) match {
-      case Some((msg,newChain,destUH,txt,keyboard)) => {
-        val editM = EditMessageReplyMarkup(Some(ChatId(msg.source)), Some(msg.messageId), cbk.inlineMessageId, replyMarkup = None)
-        request(editM)
-        botActor ! SendMessage(destUH.user.id, txt, replyMarkup = keyboard)
-        keyboard match {
-          case Some(k) => botActor ! SendMessage(msg.source, chainContinuingText(newChain))
-          case None => {
-            val txtCompleted = chainCompletedText(newChain)
-            newChain
-              .users
-              .tail
-              .foreach { userH =>
-                botActor ! SendMessage(userH.user.id, txtCompleted)
-              }
-          }
-        }
-      }
-      case None => botlog.error("WTF!")
-    }
-  }
-
+//  onCommand("/cadenadeabrazos"){ implicit msg =>
+//    allowedUser(Some("cadenaabrazos")) { uH =>
+//      val hugChain = newHugChain(uH)
+//      val (txt,keyboard) = GrupoBotHugChain.getHugChainMessage(hugChain,permittedUserHandlers)
+//      reply(txt,replyMarkup = keyboard)
+//    }
+//  }
 //
+//  onCallbackWithTag(hugChainCallbackDataKeyword){ implicit cbk =>
+//    processHugChainCallbackData(cbk.message,cbk.data) match {
+//      case Some((msg,newChain,destUH,txt,keyboard)) => {
+//        val editM = EditMessageReplyMarkup(Some(ChatId(msg.source)), Some(msg.messageId), cbk.inlineMessageId, replyMarkup = None)
+//        request(editM)
+//        botActor ! SendMessage(destUH.user.id, txt, replyMarkup = keyboard)
+//        keyboard match {
+//          case Some(k) => botActor ! SendMessage(msg.source, chainContinuingText(newChain))
+//          case None => {
+//            val txtCompleted = chainCompletedText(newChain)
+//            newChain
+//              .users
+//              .tail
+//              .foreach { userH =>
+//                botActor ! SendMessage(userH.user.id, txtCompleted)
+//              }
+//          }
+//        }
+//      }
+//      case None => botlog.error("WTF!")
+//    }
+//  }
+//
+////
 
   val wordRegex = "[\\p{L}]+".r
 
