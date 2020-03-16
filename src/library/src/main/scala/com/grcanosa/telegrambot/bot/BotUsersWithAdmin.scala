@@ -7,10 +7,12 @@ import com.bot4s.telegram.models.Message
 import com.grcanosa.telegrambot.bot.user.{UserHandler, UserRegistry}
 import com.grcanosa.telegrambot.model.BotUser.{BotUserPermission, PERMISSION_ALLOWED, PERMISSION_NOT_ALLOWED, PERMISSION_NOT_SET}
 import com.grcanosa.telegrambot.model.Interaction
+import com.grcanosa.telegrambot.utils.LazyBotLogging
 
 trait BotUsersWithAdmin
   extends AkkaDefaults
-    with UserRegistry {
+    with UserRegistry
+with LazyBotLogging{
 
   import com.grcanosa.telegrambot.utils.BotUtils._
 
@@ -36,7 +38,7 @@ trait BotUsersWithAdmin
       case PERMISSION_ALLOWED => action(userH)
       case PERMISSION_NOT_SET => userRequestPermission(userH)
       case PERMISSION_NOT_ALLOWED => userNotAllowed(userH)
-      case _ => BOTLOG.error(s"No permission for user ${userH.user.name}")
+      case _ => botlog.error(s"No permission for user ${userH.user.name}")
     }
   }
 

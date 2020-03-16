@@ -1,15 +1,18 @@
 package com.grcanosa.bots.grupobot
 
+import com.grcanosa.bots.grupobot.GrupoBotHugChain.HugChain
 import com.grcanosa.telegrambot.bot.user.UserHandler
+import com.grcanosa.telegrambot.utils.LazyBotLogging
 import com.vdurmont.emoji.EmojiParser
 
+import scala.annotation.tailrec
 import scala.concurrent.duration._
 import scala.util.Try
 
-object GrupoBotData {
+object GrupoBotData extends LazyBotLogging{
 
   import com.grcanosa.telegrambot.utils.BotUtils._
-  import GrupoUtils._
+  import com.grcanosa.bots.grupobot.utils.GrupoUtils._
 
   implicit class BotStrings(s: String){
     def bottext: String = EmojiParser.parseToUnicode(":robot_face::speech_balloon: "+s)
@@ -18,7 +21,7 @@ object GrupoBotData {
 
   val conversationDuration = Try{configGrupo.getInt("grupobot.conversation.minutes")}.getOrElse(15) minutes
 
-  BOTLOG.info(s"Conversation set to last $conversationDuration")
+  botlog.info(s"Conversation set to last $conversationDuration")
 
   val noConversationReadyText = (name: String) => {
     s"Ahora mismo no te puedo conectar con nadie $name, inténtalo de nuevo más tarde!".bottext
@@ -118,6 +121,7 @@ object GrupoBotData {
     }
   }
 
+  @tailrec
   def abrazoRecursion2(li: List[UserHandler],txt: String): String = li match {
     case Nil => txt
     case u :: Nil => txt+"." //s"; que recibió el ${abrazoNombreRandom} recursivo de todos!"

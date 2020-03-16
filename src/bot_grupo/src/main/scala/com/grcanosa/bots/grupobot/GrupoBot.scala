@@ -8,6 +8,7 @@ import com.bot4s.telegram.api.declarative.Callbacks
 import com.bot4s.telegram.methods.{EditMessageReplyMarkup, SendMessage}
 import com.bot4s.telegram.models.{ChatId, Message}
 import com.grcanosa.bots.grupobot.dao.{ConversationDao, WordCountDao}
+import com.grcanosa.bots.grupobot.model.Conversation
 import com.grcanosa.bots.grupobot.utils.GrupoUtils
 import com.grcanosa.telegrambot.bot.BotWithAdmin
 import com.grcanosa.telegrambot.bot.BotWithAdmin.ForwardMessageTo
@@ -96,23 +97,25 @@ with Callbacks{
   }
 
   onCallbackWithTag(hugChainCallbackDataKeyword){ implicit cbk =>
-    processHugChainCallbackData(cbk.message,cbk.data) match {case Some((msg,newChain,destUH,txt,keyboard)) =>
-      val editM = EditMessageReplyMarkup(Some(ChatId(msg.source)), Some(msg.messageId), cbk.inlineMessageId,replyMarkup = None)
-      request(editM)
-      botActor ! SendMessage(destUH.user.id, txt, replyMarkup = keyboard)
-      keyboard match {
-        case Some(k) => botActor ! SendMessage(msg.source,chainContinuingText(newChain))
-        case None => {
-          val txtCompleted = chainCompletedText(newChain)
-          newChain
-            .users
-            .tail
-            .foreach { userH =>
-              botActor ! SendMessage(userH.user.id, txtCompleted)
-            }
+    processHugChainCallbackData(cbk.message,cbk.data) match {
+      case Some((msg,newChain,destUH,txt,keyboard)) => {
+        val editM = EditMessageReplyMarkup(Some(ChatId(msg.source)), Some(msg.messageId), cbk.inlineMessageId, replyMarkup = None)
+        request(editM)
+        botActor ! SendMessage(destUH.user.id, txt, replyMarkup = keyboard)
+        keyboard match {
+          case Some(k) => botActor ! SendMessage(msg.source, chainContinuingText(newChain))
+          case None => {
+            val txtCompleted = chainCompletedText(newChain)
+            newChain
+              .users
+              .tail
+              .foreach { userH =>
+                botActor ! SendMessage(userH.user.id, txtCompleted)
+              }
+          }
         }
       }
-
+      case None => botlog.error("WTF!")
     }
   }
 
@@ -127,7 +130,7 @@ with Callbacks{
         wordRegex.findAllIn(str).matchData.map(_.group(0)).toList
       }
     }.recover{
-      case e => BOTLOG.error(s"$e"); Some(List.empty[String])
+      case e => botlog.error(s"$e"); Some(List.empty[String])
     }.getOrElse(Some(List.empty[String]))
     //BOTLOG.info(s"WORDS: $words")
     words.map(wordList =>
@@ -159,7 +162,7 @@ with Callbacks{
 
     def receive = {
       case CancelConversation(conv) => {
-        BOTLOG.info(s"Cancelling conversation between ${conv.uh1.user.name} and ${conv.uh2.user.name}")
+        botlog.info(s"Cancelling conversation between ${conv.uh1.user.name} and ${conv.uh2.user.name}")
         userConversations = userConversations.filter(_ isNotEqual conv)
         botActor ! SendMessage(conv.uh1.user.id,conversationEndedText)
         botActor ! SendMessage(conv.uh2.user.id,conversationEndedText)

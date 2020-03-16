@@ -5,7 +5,6 @@ import akka.http.scaladsl.model.headers.{BasicHttpCredentials, HttpCredentials, 
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{ContentType, ContentTypes, HttpEntity, HttpHeader, HttpMethod, HttpMethods, HttpRequest, HttpResponse, StatusCodes}
 import com.grcanosa.telegrambot.bot.BotWithAdmin
-import com.grcanosa.telegrambot.utils.BotUtils.BOTLOG
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
@@ -13,8 +12,9 @@ import scala.util.{Failure, Success}
 import spray.json._
 import DefaultJsonProtocol._
 import akka.util.ByteString
+import com.grcanosa.telegrambot.utils.LazyBotLogging
 
-trait HomeAssistant { this: BotWithAdmin =>
+trait HomeAssistant extends LazyBotLogging{ this: BotWithAdmin =>
 
   val http = Http(system)
 
@@ -59,9 +59,9 @@ trait HomeAssistant { this: BotWithAdmin =>
 
 
   def addTermoMinutes(min: Int): Future[Double] = {
-    BOTLOG.info(s"Increasing termo $min minutes")
+    botlog.info(s"Increasing termo $min minutes")
     getTermoState().flatMap{ st =>
-      BOTLOG.info(s"State is $st ")
+      botlog.info(s"State is $st ")
       val new_time: Double = st + min
       val termo_state = termoValueJson(new_time)
       //BOTLOG.info(s"Termo is $termo_state ")

@@ -6,12 +6,12 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.headers.RawHeader
 import akka.http.scaladsl.model.{ContentTypes, HttpMethods, HttpRequest, HttpResponse}
 import akka.stream.ActorMaterializer
-import com.grcanosa.telegrambot.utils.BotUtils.BOTLOG
+import com.grcanosa.telegrambot.utils.LazyBotLogging
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-object Test extends App{
+object Test extends App with LazyBotLogging{
 
   def homeAssistantToken: String = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIzYjUyZDVkYzRiOTA0MTRhYWEwYzA0ZjU0NmFlYWUxNSIsImlhdCI6MTU2Njc1MTYyOSwiZXhwIjoxODgyMTExNjI5fQ.x7MZVzd8XuGoTc_XEfU-tbfaBwJSapVJS9FqTIfJ-YI"
 
@@ -32,13 +32,13 @@ object Test extends App{
   println(15.toDouble.toString)
 
   def updateTermo() = {
-    BOTLOG.info("REQUESTING")
+    botlog.info("REQUESTING")
     val a: Future[HttpResponse] = http.singleRequest(req)
     a.onComplete {
-      case Success(res) => BOTLOG.info(res.toString())
-      case Failure(_)   => BOTLOG.error("something wrong")
+      case Success(res) => botlog.info(res.toString())
+      case Failure(_)   => botlog.error("something wrong")
     }
-    BOTLOG.info(a.toString)
+    botlog.info(a.toString)
   }
 
   updateTermo()

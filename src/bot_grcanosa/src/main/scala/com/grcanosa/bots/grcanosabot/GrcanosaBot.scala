@@ -11,11 +11,12 @@ import com.grcanosa.telegrambot.bot.BotWithAdmin
 import com.grcanosa.telegrambot.dao.{BotDao, BotUserDao, InteractionDao}
 import com.grcanosa.telegrambot.dao.mongo.{BotUserMongoDao, InteractionMongoDao}
 import com.grcanosa.telegrambot.model.BotUser
+import com.grcanosa.telegrambot.utils.LazyBotLogging
 
 import scala.concurrent.duration._
-import com.grcanosa.telegrambot.utils.BotUtils.BOTLOG
 
-object GrcanosaBot extends AkkaDefaults{
+
+object GrcanosaBot extends AkkaDefaults with LazyBotLogging{
 
   import com.grcanosa.bots.grcanosabot.utils.GrcanosaBotUtils._
 
