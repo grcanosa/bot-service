@@ -5,7 +5,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 object GrupoUtils {
 
   lazy val configGrupoOlmo: Config = {
-    ConfigFactory.load("grupo_bot.conf")
+    ConfigFactory.load("grupobot.conf")
   }
 
   lazy val configBaileGrupo = {

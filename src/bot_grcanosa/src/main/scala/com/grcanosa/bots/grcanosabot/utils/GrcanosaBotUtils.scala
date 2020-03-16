@@ -5,7 +5,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 object GrcanosaBotUtils {
 
   lazy val configGrcanosa: Config = {
-    ConfigFactory.load("grcanosa_bot.conf")
+    ConfigFactory.load("grcanosabot.conf")
   }
 
 }
