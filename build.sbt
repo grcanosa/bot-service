@@ -19,7 +19,7 @@ lazy val root = project
   )
 
 lazy val library = project
-  .in(file("library"))
+  .in(file("src/library"))
   .enablePlugins(PackagingTypePlugin)
   .disablePlugins(AssemblyPlugin)
   .settings(
@@ -30,7 +30,7 @@ lazy val library = project
 
 
 lazy val bot_grcanosa = project
-  .in(file("bot_grcanosa"))
+  .in(file("src/bot_grcanosa"))
   .enablePlugins(PackagingTypePlugin)
   .enablePlugins(AssemblyPlugin)
   .settings(
@@ -49,7 +49,7 @@ lazy val bot_grcanosa = project
 
 
 lazy val bot_grupo = project
-  .in(file("bot_grupo"))
+  .in(file("src/bot_grupo"))
   .enablePlugins(PackagingTypePlugin)
   .enablePlugins(AssemblyPlugin)
   .settings(
@@ -68,7 +68,7 @@ lazy val bot_grupo = project
 
 
 lazy val bot_renfe = project
-  .in(file("bot_renfe"))
+  .in(file("src/bot_renfe"))
   .enablePlugins(PackagingTypePlugin)
   .enablePlugins(AssemblyPlugin)
   .settings(
