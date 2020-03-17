@@ -8,8 +8,5 @@ object GrupoUtils {
     ConfigFactory.load("grupobot.conf")
   }
 
-  lazy val configBaileGrupo = {
-    ConfigFactory.load("grupo_baile_bot.conf")
-  }
 
 }
