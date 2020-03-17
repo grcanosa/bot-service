@@ -16,6 +16,7 @@ object RenfeBotUserActor{
 
   case object MenuCommand extends RenfeBotUserMsg
   case object CancelCommand extends RenfeBotUserMsg
+  case class KeyboardCallbackData(data: String) extends RenfeBotUserMsg
 
 }
 
@@ -40,6 +41,11 @@ class RenfeBotUserActor(val botUser: BotUser,val botActor: ActorRef) extends Act
 
     case msg: Message => {
       renfeBotUser = renfeBotUser.processMessage(msg)
+      renfeBotUser.responses.foreach(botActor ! _)
+    }
+
+    case KeyboardCallbackData(data) => {
+      renfeBotUser = renfeBotUser.processKeyboardCallbackData(data)
       renfeBotUser.responses.foreach(botActor ! _)
     }
   }

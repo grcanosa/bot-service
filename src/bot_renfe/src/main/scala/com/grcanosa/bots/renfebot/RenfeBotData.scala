@@ -1,8 +1,9 @@
 package com.grcanosa.bots.renfebot
 
 import com.bot4s.telegram.models.{InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove}
+import com.grcanosa.telegrambot.utils.CalendarKeyboard
 
-object RenfeBotData {
+object RenfeBotData extends CalendarKeyboard{
 
   import com.grcanosa.telegrambot.utils.BotUtils._
 

@@ -2,11 +2,13 @@
 
  import akka.actor.{Actor, ActorRef, Props}
  import com.bot4s.telegram.api.AkkaDefaults
+ import com.bot4s.telegram.api.declarative.Callbacks
  import com.bot4s.telegram.models.Message
  import com.grcanosa.telegrambot.bot.BotWithAdmin
  import com.grcanosa.telegrambot.dao.{BotDao, BotUserDao, InteractionDao}
  import com.grcanosa.telegrambot.dao.mongo.{BotUserMongoDao, InteractionMongoDao}
  import com.grcanosa.telegrambot.model.BotUser
+ import com.grcanosa.telegrambot.utils.CalendarKeyboard
  import com.typesafe.config.ConfigFactory
  import com.typesafe.sslconfig.util.ConfigLoader
 
@@ -43,7 +45,9 @@
                    , override val adminId: Long
                    )
                   (implicit botDao: BotDao)
-   extends BotWithAdmin(token,adminId){
+   extends BotWithAdmin(token,adminId)
+ with Callbacks
+ with CalendarKeyboard{
 
    import RenfeBotUserActor._
 
@@ -65,6 +69,17 @@
         uH.handler ! msg
       }
      }
+   }
+
+
+   onCallbackWithTag(KEYBOARD_TAG){ implicit cbk =>
+    cbk.message.foreach{ implicit msg =>
+      allowedUser(Some("keyboard_callback")){ uH =>
+        cbk.data.foreach{ data =>
+          uH.handler ! KeyboardCallbackData(data)
+        }
+      }
+    }
    }
 
 

@@ -9,12 +9,14 @@ import scala.collection.immutable
 
 trait CalendarKeyboard {
 
-  val IGNORE_ACTION = "IGNORE"
-  val CHANGE_MONTH = "CHANGE_MONTH"
-  val DAY_ACTION = "DAY"
+  lazy val KEYBOARD_TAG = "CALENDAR_KEYBOARD"
+
+  lazy val IGNORE_ACTION = "IGNORE"
+  lazy val CHANGE_MONTH = "CHANGE_MONTH"
+  lazy val DAY_ACTION = "DAY"
 
   def createCallbackData(action: String,year:String,month: String, day: String) = {
-    Some(Seq(action,year,month,day).mkString(";"))
+    Some(Seq(KEYBOARD_TAG,action,year,month,day).mkString(";"))
   }
 
   def separateCallbackData(data: String) = {
@@ -24,18 +26,18 @@ trait CalendarKeyboard {
     }
   }
 
-  val ignoreCallbakData: Option[String] = createCallbackData(IGNORE_ACTION,"Y","M","D")
+  lazy val ignoreCallbakData: Option[String] = createCallbackData(IGNORE_ACTION,"Y","M","D")
 
-  val emptyButton: InlineKeyboardButton = InlineKeyboardButton("X",ignoreCallbakData)
+  lazy val emptyButton: InlineKeyboardButton = InlineKeyboardButton("X",ignoreCallbakData)
 
 
-  val weekButtons: Seq[InlineKeyboardButton] =
+  lazy val weekButtons: Seq[InlineKeyboardButton] =
     Seq( "Mo","Tu","We","Th","Fr","Sa","Su")
       .map(s => InlineKeyboardButton(s,ignoreCallbakData))
 
 
 
-  def createCalendar(yearO: Option[Int], monthO: Option[Int]): InlineKeyboardMarkup = {
+  def createCalendar(yearO: Option[Int]=None, monthO: Option[Int]=None): InlineKeyboardMarkup = {
     val year: Int = yearO.getOrElse(java.time.LocalDateTime.now().getYear)
     val month: Int = monthO.getOrElse(java.time.LocalDateTime.now().getMonthValue)
     createCalendar(year,month)
@@ -106,7 +108,7 @@ trait CalendarKeyboard {
     separateCallbackData(data) match {
       case (IGNORE_ACTION,y,m,d) => (None,None)
       case (CHANGE_MONTH,y,m,d) => (Some(createCalendar(y.toInt,m.toInt)),None)
-      case (DAY_ACTION,y,m,d) => (None,Some((y.toInt,m.toInt,d.toInt)))
+      case (DAY_ACTION,y,m,d) => (None,Some(LocalDate.of(y.toInt,m.toInt,d.toInt)))
     }
   }
 

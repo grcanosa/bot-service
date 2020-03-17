@@ -1,5 +1,7 @@
 package com.grcanosa.bots.renfebot.user
 
+import java.time.format.DateTimeFormatter
+
 import com.bot4s.telegram.methods.SendMessage
 import com.bot4s.telegram.models.{Message, ReplyMarkup}
 import com.grcanosa.bots.renfebot.user.RenfeBotUser.{RenfeBotUserState, START_STATE, UserState}
@@ -37,7 +39,9 @@ object RenfeBotUser {
 
 }
 
-class RenfeBotUser(val botUser: BotUser, val state: RenfeBotUserState, val responses: Seq[Any]) {
+class RenfeBotUser(val botUser: BotUser
+                   , val state: RenfeBotUserState
+                   , val responses: Seq[Any]) {
 
   import RenfeBotUser._
   import com.grcanosa.bots.renfebot.RenfeBotData._
@@ -80,14 +84,29 @@ class RenfeBotUser(val botUser: BotUser, val state: RenfeBotUserState, val respo
           , state.copy(state = SELECT_DATE_STATE,dest = Some(txt))
           , Seq(
             SendMessage(botUser.id,selectedTrip(state.origin.getOrElse(""),state.dest.getOrElse("")))
-            , SendMessage(botUser.id,selectDateText,dateKeyboard())
+            , SendMessage(botUser.id,selectDateText,createCalendar())
           )
         )
     }
   }
 
-  private def processDate(msg: Message) = {
+  val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
+  private def processKeyboardCallbackData(data: String) = {
+    processCallbackData(data) match {
+      case (None, None) => new RenfeBotUser(botUser,state,Seq.empty)
+      case (Some(newKeyboard), None) =>
+      case (None, Some(date)) => processDate(date.format(dateFormatter))
+      case _ => new RenfeBotUser(botUser,state,Seq.empty)
+    }
+  }
+
+  private def processDate(date: String) = {
+    new RenfeBotUser(botUser,
+      START_USER_STATE,
+      Seq(
+        SendMessage(botUser.id,,removeKeyboard)
+      )
   }
 
 
@@ -102,13 +121,13 @@ class RenfeBotUser(val botUser: BotUser, val state: RenfeBotUserState, val respo
           ))
       }
       case Some(ConsultaPeriodicaMenuText) => {
-        this
+        ???
       }
       case Some(EliminarConsultaPeriodicaMenuText) => {
-        this
+        ???
       }
       case Some(VerConsultaPeriodicaMenuText) => {
-        this
+        ???
       }
       case None => {
         new RenfeBotUser(botUser,state,Seq(SendMessage(botUser.id,respuestaNoValidaText)))
