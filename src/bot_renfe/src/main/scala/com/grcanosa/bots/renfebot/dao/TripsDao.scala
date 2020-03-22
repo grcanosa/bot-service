@@ -34,7 +34,10 @@ object TripsDao {
   val foldFunction: (TripMapType, TripMongo) => TripMapType =
     (map: TripMapType, tripMongo: TripMongo) => {
     map.get(trip2Tuple(tripMongo.trip)) match {
-      case Some(setUserId) => map + (trip2Tuple(tripMongo.trip) -> (setUserId ++ Set(tripMongo.trip)))
+      case Some(setUserId) => {
+        val newSet = setUserId + tripMongo.userId
+        map + (trip2Tuple(tripMongo.trip) -> newSet)
+      }
       case None => map + (trip2Tuple(tripMongo.trip) -> Set(tripMongo.userId))
     }
   }

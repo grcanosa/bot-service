@@ -7,6 +7,7 @@ import akka.actor.{ActorRef, Props}
 import com.bot4s.telegram.api.AkkaDefaults
 import com.bot4s.telegram.api.declarative.Callbacks
 import com.bot4s.telegram.methods.SendMessage
+import com.grcanosa.bots.renfebot.bot.RenfeBot.{AddTripToDao, CleanDao, RemoveTripFromDao}
 import com.grcanosa.bots.renfebot.dao.TripsDao
 import com.grcanosa.bots.renfebot.model.Trip
 import com.grcanosa.bots.renfebot.user.RenfeBotUserActor

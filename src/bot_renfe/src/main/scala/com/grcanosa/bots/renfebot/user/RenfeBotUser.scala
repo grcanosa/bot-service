@@ -92,7 +92,7 @@ class RenfeBotUser(val botUser: BotUser
 
   val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
-  private def processKeyboardCallbackData(messageId: Int,data: String): RenfeBotUser = {
+  def processKeyboardCallbackData(messageId: Int,data: String): RenfeBotUser = {
     processCallbackData(data) match {
       case (None, None) => new RenfeBotUser(botUser,state,Seq.empty)
       case (Some(newKeyboard), None) => new RenfeBotUser(botUser,state,Seq(
