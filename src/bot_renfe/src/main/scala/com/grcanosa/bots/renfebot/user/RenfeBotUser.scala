@@ -83,7 +83,7 @@ class RenfeBotUser(val botUser: BotUser
         new RenfeBotUser(botUser
           , state.copy(state = SELECT_DATE_STATE,dest = Some(txt))
           , Seq(
-            SendMessage(botUser.id,selectedTrip(state.origin.getOrElse(""),state.dest.getOrElse("")))
+            SendMessage(botUser.id,selectedTripOriginDeparture(state.origin.getOrElse(""),state.dest.getOrElse("")))
             , SendMessage(botUser.id,selectDateText,createCalendar())
           )
         )
@@ -105,8 +105,9 @@ class RenfeBotUser(val botUser: BotUser
     new RenfeBotUser(botUser,
       START_USER_STATE,
       Seq(
-        SendMessage(botUser.id,,removeKeyboard)
+        SendMessage(botUser.id,selectedTripFull(state.origin.get,state.dest.get,date),removeKeyboard)
       )
+    )
   }
 
 

@@ -1,11 +1,7 @@
 package com.grcanosa.telegrambot.utils
 
 import java.time.LocalDate
-import java.util.{Calendar, GregorianCalendar, Locale}
-
 import com.bot4s.telegram.models.{InlineKeyboardButton, InlineKeyboardMarkup}
-
-import scala.collection.immutable
 
 trait CalendarKeyboard {
 
@@ -60,7 +56,7 @@ trait CalendarKeyboard {
     }
   }
 
-  def getPrevNextButtons(year: Int, month: Int) = {
+  def getPrevNextButtons(year: Int, month: Int): Seq[InlineKeyboardButton] = {
     val nextMonthButton: InlineKeyboardButton = month match {
       case 12 => InlineKeyboardButton(">",createCallbackData(CHANGE_MONTH,s"${year+1}","1","D"))
       case _ => InlineKeyboardButton(">",createCallbackData(CHANGE_MONTH,s"${year}",s"${month+1}","D"))
@@ -106,8 +102,8 @@ trait CalendarKeyboard {
 
   def processCallbackData(data: String) = {
     separateCallbackData(data) match {
-      case (IGNORE_ACTION,y,m,d) => (None,None)
-      case (CHANGE_MONTH,y,m,d) => (Some(createCalendar(y.toInt,m.toInt)),None)
+      case (IGNORE_ACTION,_,_,_) => (None,None)
+      case (CHANGE_MONTH,y,m,_) => (Some(createCalendar(y.toInt,m.toInt)),None)
       case (DAY_ACTION,y,m,d) => (None,Some(LocalDate.of(y.toInt,m.toInt,d.toInt)))
     }
   }

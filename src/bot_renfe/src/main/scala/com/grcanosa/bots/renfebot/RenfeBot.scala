@@ -1,16 +1,23 @@
  package com.grcanosa.bots.renfebot
 
+ import java.time.LocalDate
+ import java.time.format.DateTimeFormatter
+
  import akka.actor.{Actor, ActorRef, Props}
  import com.bot4s.telegram.api.AkkaDefaults
  import com.bot4s.telegram.api.declarative.Callbacks
- import com.bot4s.telegram.models.Message
+ import com.grcanosa.bots.renfebot.RenfeBot.{AddTripToDao, CleanDao, RemoveTripFromDao}
+ import com.grcanosa.bots.renfebot.dao.TripsDao
+ import com.grcanosa.bots.renfebot.model.Trip
  import com.grcanosa.telegrambot.bot.BotWithAdmin
  import com.grcanosa.telegrambot.dao.{BotDao, BotUserDao, InteractionDao}
  import com.grcanosa.telegrambot.dao.mongo.{BotUserMongoDao, InteractionMongoDao}
  import com.grcanosa.telegrambot.model.BotUser
  import com.grcanosa.telegrambot.utils.CalendarKeyboard
  import com.typesafe.config.ConfigFactory
- import com.typesafe.sslconfig.util.ConfigLoader
+
+ import scala.concurrent.duration._
+ import scala.util.{Failure, Success}
 
  object RenfeBot extends AkkaDefaults{
 
@@ -29,6 +36,8 @@
 
    val mongoInteractionDao = new InteractionMongoDao(mongoHost, mongoPort, mongoDatabaseName)
 
+   implicit val tripDao = new TripsDao(mongoHost,mongoPort,mongoDatabaseName)
+
    implicit object RenfeDao extends BotDao{
      override def botUserDao: BotUserDao = mongoUserDao
 
@@ -38,13 +47,17 @@
 
    val bot = new RenfeBot(token,adminId)
 
+   case class AddTripToDao(user: BotUser, trip: Trip)
+   case class RemoveTripFromDao(user: BotUser, trip: Trip)
+   case object CleanDao
+
  }
 
 
  class RenfeBot(override val token: String
                    , override val adminId: Long
                    )
-                  (implicit botDao: BotDao)
+                  (implicit botDao: BotDao, tripsDao: TripsDao)
    extends BotWithAdmin(token,adminId)
  with Callbacks
  with CalendarKeyboard{
@@ -83,16 +96,39 @@
    }
 
 
-   class RenfeBotActor extends Actor{
-     override def receive = {
-       case _ => println("hola")
+   system.scheduler.schedule(0 seconds, 12 hours){
+     botActor ! CleanDao
+   }
+
+   val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+
+   override def additionalReceive: ActorReceive = {
+     case AddTripToDao(user, trip) => {
+      tripsDao.addTrip(user,trip).onComplete{
+        case Success(true) =>
+        case Success(false) =>
+        case Failure(excp) =>
+      }
      }
+     case RemoveTripFromDao(user, trip) => {
+      tripsDao.removeTrip(user,trip).onComplete{
+        case Success() =>
+        case Failure() =>
+      }
+     }
+     case CleanDao => {
+       val lastDate = LocalDate.now().format(dateFormatter)
+       tripsDao.markOldTripsAsInactive(lastDate).onComplete{
+         case Success()
+         case Failure()
+       }
+     }
+     case _ =>
    }
 
 
-
    override def createNewUserActor(botUser: BotUser): ActorRef = {
-     system.actorOf(Props(new RenfeBotActor),s"actor_${botUser.id}")
+     system.actorOf(Props(new RenfeBotUserActor(botUser,botActor)),s"actor_${botUser.id}")
    }
 
    override def userNotAllowedResponse(name: String): String = notAllowedText

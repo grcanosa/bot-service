@@ -1,5 +1,6 @@
 package com.grcanosa.telegrambot.bot
 
+
 import akka.actor.{Actor, Props}
 import com.bot4s.telegram.api.declarative.{Commands, Messages}
 import com.bot4s.telegram.api.{AkkaDefaults, Polling, TelegramBot}
@@ -108,10 +109,18 @@ with Commands
   }
 
 
+  type ActorReceive = PartialFunction[Any, Unit]
+
+  def additionalReceive: ActorReceive = {
+    case _ =>
+  }
+
+
+
+
   class BotActor extends Actor{
 
-
-    override def receive = {
+    def standardReceive: ActorReceive = {
       case sm: SendMessage => request(sm)
       case sp: SendPhoto => request(sp)
       case sam: SendAnimation => request(sam)
@@ -122,16 +131,19 @@ with Commands
       case ForwardMessageTo(cid,msg) => {
         msg.text.foreach(s => self ! SendMessage(cid,s))
         msg.photo.foreach(s => self ! SendPhoto(cid
-                              ,InputFile(s.reverse.head.fileId)
-                              ,caption=msg.caption)
-                        )
+          ,InputFile(s.reverse.head.fileId)
+          ,caption=msg.caption)
+        )
         msg.animation.foreach( s => self ! SendAnimation(cid,InputFile(s.fileId),replyToMessageId = None))
         msg.audio.foreach(s => self ! SendAudio(cid,InputFile(s.fileId)))
         msg.video.foreach(s => self ! SendVideo(cid,InputFile(s.fileId),duration=Some(s.duration)))
         msg.videoNote.foreach(s => self ! SendVideoNote(cid,InputFile(s.fileId)))
         msg.voice.foreach(s => self ! SendVoice(cid,InputFile(s.fileId)))
       }
-      case _ =>
+    }
+
+    override def receive = {
+      standardReceive orElse additionalReceive
     }
   }
 

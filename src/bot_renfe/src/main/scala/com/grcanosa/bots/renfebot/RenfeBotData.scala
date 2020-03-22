@@ -49,7 +49,9 @@ object RenfeBotData extends CalendarKeyboard{
   lazy val selectDestText = "Introduce estación destino :train2:".emojize
   lazy val selectDateText = "Elige ahora la fecha del viaje :calendar:".emojize
 
-  lazy val selectedTrip = (ori: String,dest: String) => s"Has seleccionado el trayecto $ori -> $dest.".emojize
+  lazy val selectedTripOriginDeparture = (ori: String, dest: String) => s"Has seleccionado el trayecto $ori -> $dest.".emojize
+
+  lazy val selectedTripFull = (ori: String, dest: String, date: String) => s"Has seleccionado el trayecto $ori -> $dest para el dia $date".emojize
 
 
   def dateKeyboard(): InlineKeyboardMarkup = {
