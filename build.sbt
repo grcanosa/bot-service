@@ -87,6 +87,7 @@ lazy val bot_apps = project
   .dependsOn(
      bot_grcanosa
     , bot_grupo
+    , bot_renfe
   )
 
 val telegramBotVersion = "4.0.0-RC2"

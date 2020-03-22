@@ -1,6 +1,6 @@
-package com.grcanosa.bots.renfebot
+package com.grcanosa.bots.renfebot.bot
 
-import com.bot4s.telegram.models.{InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove}
+import com.bot4s.telegram.models.{KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove}
 import com.grcanosa.telegrambot.utils.CalendarKeyboard
 
 object RenfeBotData extends CalendarKeyboard{
@@ -53,8 +53,25 @@ object RenfeBotData extends CalendarKeyboard{
 
   lazy val selectedTripFull = (ori: String, dest: String, date: String) => s"Has seleccionado el trayecto $ori -> $dest para el dia $date".emojize
 
+  lazy val tripAddedText = s"TRIP ADDED".emojize
 
-  def dateKeyboard(): InlineKeyboardMarkup = {
+  lazy val errorAddingTripText = s"ERROR ADDING TRIP".emojize
 
-  }
+  lazy val tripRemovedText = s"TRIP REMOVED".emojize
+
+  lazy val tripRemovedErrorText = s"TRIP ERROR REMOVED".emojize
+
+  lazy val tripDaoCleanText = s"TRIP DAO CLEAN".emojize
+
+  lazy val tripDaoCleanErrorText = s"TRIP DAO CLEAN ERROR".emojize
+
+  lazy val notAllowedText = (name: String) => s"".emojize
+
+  lazy val requestingPermissionText = (name: String) => s"".emojize
+
+  lazy val startText = (name: String) => s"".emojize
+
+  lazy val helpText = (name: String) => s"".emojize
+
+
 }

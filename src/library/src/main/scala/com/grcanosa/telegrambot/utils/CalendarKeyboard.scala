@@ -100,7 +100,7 @@ trait CalendarKeyboard {
     InlineKeyboardMarkup(calendarKeys)
   }
 
-  def processCallbackData(data: String) = {
+  def processCallbackData(data: String): (Option[InlineKeyboardMarkup], Option[LocalDate]) = {
     separateCallbackData(data) match {
       case (IGNORE_ACTION,_,_,_) => (None,None)
       case (CHANGE_MONTH,y,m,_) => (Some(createCalendar(y.toInt,m.toInt)),None)

@@ -1,23 +1,24 @@
- package com.grcanosa.bots.renfebot
+ package com.grcanosa.bots.renfebot.bot
 
- import java.time.LocalDate
- import java.time.format.DateTimeFormatter
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
- import akka.actor.{Actor, ActorRef, Props}
- import com.bot4s.telegram.api.AkkaDefaults
- import com.bot4s.telegram.api.declarative.Callbacks
- import com.grcanosa.bots.renfebot.RenfeBot.{AddTripToDao, CleanDao, RemoveTripFromDao}
- import com.grcanosa.bots.renfebot.dao.TripsDao
- import com.grcanosa.bots.renfebot.model.Trip
- import com.grcanosa.telegrambot.bot.BotWithAdmin
- import com.grcanosa.telegrambot.dao.{BotDao, BotUserDao, InteractionDao}
- import com.grcanosa.telegrambot.dao.mongo.{BotUserMongoDao, InteractionMongoDao}
- import com.grcanosa.telegrambot.model.BotUser
- import com.grcanosa.telegrambot.utils.CalendarKeyboard
- import com.typesafe.config.ConfigFactory
+import akka.actor.{ActorRef, Props}
+import com.bot4s.telegram.api.AkkaDefaults
+import com.bot4s.telegram.api.declarative.Callbacks
+import com.bot4s.telegram.methods.SendMessage
+import com.grcanosa.bots.renfebot.dao.TripsDao
+import com.grcanosa.bots.renfebot.model.Trip
+import com.grcanosa.bots.renfebot.user.RenfeBotUserActor
+import com.grcanosa.telegrambot.bot.BotWithAdmin
+import com.grcanosa.telegrambot.dao.mongo.{BotUserMongoDao, InteractionMongoDao}
+import com.grcanosa.telegrambot.dao.{BotDao, BotUserDao, InteractionDao}
+import com.grcanosa.telegrambot.model.BotUser
+import com.grcanosa.telegrambot.utils.CalendarKeyboard
+import com.typesafe.config.ConfigFactory
 
- import scala.concurrent.duration._
- import scala.util.{Failure, Success}
+import scala.concurrent.duration._
+import scala.util.{Failure, Success}
 
  object RenfeBot extends AkkaDefaults{
 
@@ -62,6 +63,7 @@
  with Callbacks
  with CalendarKeyboard{
 
+   import RenfeBotData._
    import RenfeBotUserActor._
 
    onCommand("/menu"){ implicit msg =>
@@ -89,14 +91,14 @@
     cbk.message.foreach{ implicit msg =>
       allowedUser(Some("keyboard_callback")){ uH =>
         cbk.data.foreach{ data =>
-          uH.handler ! KeyboardCallbackData(data)
+          uH.handler ! KeyboardCallbackData(msg.messageId,data)
         }
       }
     }
    }
 
 
-   system.scheduler.schedule(0 seconds, 12 hours){
+   system.scheduler.schedule(0 seconds, 24 hours){
      botActor ! CleanDao
    }
 
@@ -105,22 +107,22 @@
    override def additionalReceive: ActorReceive = {
      case AddTripToDao(user, trip) => {
       tripsDao.addTrip(user,trip).onComplete{
-        case Success(true) =>
-        case Success(false) =>
-        case Failure(excp) =>
+        case Success(true) => botActor ! SendMessage(user.id,tripAddedText,replyMarkup = Some(removeKeyboard))
+        case Success(false) =>  botActor ! SendMessage(user.id,errorAddingTripText,replyMarkup = Some(removeKeyboard))
+        case Failure(excp) =>  botActor ! SendMessage(user.id,errorAddingTripText,replyMarkup = Some(removeKeyboard))
       }
      }
      case RemoveTripFromDao(user, trip) => {
       tripsDao.removeTrip(user,trip).onComplete{
-        case Success() =>
-        case Failure() =>
+        case Success(_) => botActor ! SendMessage(user.id,tripRemovedText,replyMarkup = Some(removeKeyboard))
+        case Failure(_) => botActor ! SendMessage(user.id,tripRemovedErrorText,replyMarkup = Some(removeKeyboard))
       }
      }
      case CleanDao => {
        val lastDate = LocalDate.now().format(dateFormatter)
        tripsDao.markOldTripsAsInactive(lastDate).onComplete{
-         case Success()
-         case Failure()
+         case Success(_) => botActor ! SendMessage(adminId,tripDaoCleanText,replyMarkup = Some(removeKeyboard))
+         case Failure(_) => botActor ! SendMessage(adminId,tripDaoCleanErrorText,replyMarkup = Some(removeKeyboard))
        }
      }
      case _ =>
@@ -131,13 +133,13 @@
      system.actorOf(Props(new RenfeBotUserActor(botUser,botActor)),s"actor_${botUser.id}")
    }
 
-   override def userNotAllowedResponse(name: String): String = notAllowedText
+   override def userNotAllowedResponse(name: String): String = notAllowedText(name)
 
-   override def userRequestPermissionResponse(name: String) = requestingPermissionText
+   override def userRequestPermissionResponse(name: String) = requestingPermissionText(name)
 
-   override def startCmdResponse(name: String): String = startText
+   override def startCmdResponse(name: String): String = startText(name)
 
-   override def helpCmdResponse(name: String) = helpText
+   override def helpCmdResponse(name: String) = helpText(name)
 
 
  }

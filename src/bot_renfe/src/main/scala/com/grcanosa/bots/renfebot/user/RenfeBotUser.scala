@@ -2,7 +2,7 @@ package com.grcanosa.bots.renfebot.user
 
 import java.time.format.DateTimeFormatter
 
-import com.bot4s.telegram.methods.SendMessage
+import com.bot4s.telegram.methods.{EditMessageReplyMarkup, SendMessage}
 import com.bot4s.telegram.models.{Message, ReplyMarkup}
 import com.grcanosa.bots.renfebot.user.RenfeBotUser.{RenfeBotUserState, START_STATE, UserState}
 import com.grcanosa.telegrambot.model.BotUser
@@ -44,7 +44,7 @@ class RenfeBotUser(val botUser: BotUser
                    , val responses: Seq[Any]) {
 
   import RenfeBotUser._
-  import com.grcanosa.bots.renfebot.RenfeBotData._
+  import com.grcanosa.bots.renfebot.bot.RenfeBotData._
 
   def menuMessage(): RenfeBotUser = {
     new RenfeBotUser(botUser, START_USER_STATE,Seq(SendMessage(botUser.id,menuText,replyMarkup = Some(menuKeyboard))))
@@ -70,7 +70,7 @@ class RenfeBotUser(val botUser: BotUser
         new RenfeBotUser(botUser
         , state.copy(state = SELECT_DEST_STATE,origin = Some(txt))
         , Seq(
-            SendMessage(botUser.id,selectDestText,stationsKeyboard)
+            SendMessage(botUser.id,selectDestText,replyMarkup = Some(stationsKeyboard))
           )
         )
     }
@@ -84,7 +84,7 @@ class RenfeBotUser(val botUser: BotUser
           , state.copy(state = SELECT_DATE_STATE,dest = Some(txt))
           , Seq(
             SendMessage(botUser.id,selectedTripOriginDeparture(state.origin.getOrElse(""),state.dest.getOrElse("")))
-            , SendMessage(botUser.id,selectDateText,createCalendar())
+            , SendMessage(botUser.id,selectDateText,replyMarkup = Some(createCalendar()))
           )
         )
     }
@@ -92,20 +92,22 @@ class RenfeBotUser(val botUser: BotUser
 
   val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
-  private def processKeyboardCallbackData(data: String) = {
+  private def processKeyboardCallbackData(messageId: Int,data: String): RenfeBotUser = {
     processCallbackData(data) match {
       case (None, None) => new RenfeBotUser(botUser,state,Seq.empty)
-      case (Some(newKeyboard), None) =>
+      case (Some(newKeyboard), None) => new RenfeBotUser(botUser,state,Seq(
+        EditMessageReplyMarkup(Some(botUser.id),Some(messageId),replyMarkup = Some(newKeyboard))
+      ))
       case (None, Some(date)) => processDate(date.format(dateFormatter))
       case _ => new RenfeBotUser(botUser,state,Seq.empty)
     }
   }
 
-  private def processDate(date: String) = {
+  private def processDate(date: String): RenfeBotUser = {
     new RenfeBotUser(botUser,
       START_USER_STATE,
       Seq(
-        SendMessage(botUser.id,selectedTripFull(state.origin.get,state.dest.get,date),removeKeyboard)
+        SendMessage(botUser.id,selectedTripFull(state.origin.get,state.dest.get,date),replyMarkup = Some(removeKeyboard))
       )
     )
   }
@@ -117,8 +119,8 @@ class RenfeBotUser(val botUser: BotUser
         new RenfeBotUser(botUser
           , state.copy(state = SELECT_ORIGIN_STATE, action = CONSULTA_AHORA)
           , Seq(
-            SendMessage(botUser.id,hacerConsultaAhoraText,removeKeyboard)
-            , SendMessage(botUser.id,selectOriginText,stationsKeyboard)
+            SendMessage(botUser.id,hacerConsultaAhoraText,replyMarkup = Some(removeKeyboard))
+            , SendMessage(botUser.id,selectOriginText,replyMarkup = Some(stationsKeyboard))
           ))
       }
       case Some(ConsultaPeriodicaMenuText) => {

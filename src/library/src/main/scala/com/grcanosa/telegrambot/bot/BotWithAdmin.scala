@@ -128,6 +128,7 @@ with Commands
       case sv: SendVideo => request(sv)
       case svn: SendVideoNote => request(svn)
       case sv: SendVoice => request(sv)
+      case ed: EditMessageReplyMarkup => request(ed)
       case ForwardMessageTo(cid,msg) => {
         msg.text.foreach(s => self ! SendMessage(cid,s))
         msg.photo.foreach(s => self ! SendPhoto(cid
