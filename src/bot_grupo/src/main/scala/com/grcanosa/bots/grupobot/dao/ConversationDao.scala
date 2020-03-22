@@ -2,10 +2,11 @@ package com.grcanosa.bots.grupobot.dao
 
 import com.grcanosa.bots.grupobot.model.Conversation
 import com.grcanosa.telegrambot.dao.mongo.MongoResultsMappings
-import org.mongodb.scala.{MongoClient, MongoCollection}
+import org.mongodb.scala.{MongoClient, MongoCollection, MongoDatabase}
 import org.mongodb.scala.bson.codecs.Macros._
 import org.mongodb.scala.bson.codecs.DEFAULT_CODEC_REGISTRY
 import org.bson.codecs.configuration.CodecRegistries.{fromProviders, fromRegistries}
+import org.bson.codecs.configuration.CodecRegistry
 
 import scala.concurrent.ExecutionContext
 
@@ -29,12 +30,12 @@ class ConversationDao(val host: String
 
   import ConversationDao._
 
-  lazy val mongo = MongoClient(s"mongodb://$host:$port")
+  lazy val mongo: MongoClient = MongoClient(s"mongodb://$host:$port")
 
-  lazy val codecRegistry = fromRegistries(fromProviders(classOf[ConversationMongo]),
+  lazy val codecRegistry: CodecRegistry = fromRegistries(fromProviders(classOf[ConversationMongo]),
     DEFAULT_CODEC_REGISTRY )
 
-  lazy val database = mongo.getDatabase(databaseName).withCodecRegistry(codecRegistry)
+  lazy val database: MongoDatabase = mongo.getDatabase(databaseName).withCodecRegistry(codecRegistry)
 
   lazy val conversations: MongoCollection[ConversationMongo] = database.getCollection("conversations")
 

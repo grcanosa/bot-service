@@ -4,7 +4,7 @@ name in (ThisBuild, Compile) := "grcanosa-bots-multiproject"
 
 scalaVersion := "2.12.8"
 
-lazy val root = project
+lazy val bots = project
   .in(file("."))
   .settings(
     skip in publish := true
