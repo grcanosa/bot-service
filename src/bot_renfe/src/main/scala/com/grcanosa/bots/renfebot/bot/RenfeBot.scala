@@ -9,7 +9,7 @@ import com.bot4s.telegram.api.declarative.Callbacks
 import com.bot4s.telegram.methods.SendMessage
 import com.grcanosa.bots.renfebot.bot.RenfeBot.{AddTripToDao, CleanDao, RemoveTripFromDao}
 import com.grcanosa.bots.renfebot.dao.TripsDao
-import com.grcanosa.bots.renfebot.model.Trip
+import com.grcanosa.bots.renfebot.model.Journey
 import com.grcanosa.bots.renfebot.user.RenfeBotUserActor
 import com.grcanosa.telegrambot.bot.BotWithAdmin
 import com.grcanosa.telegrambot.dao.mongo.{BotUserMongoDao, InteractionMongoDao}
@@ -49,8 +49,8 @@ import scala.util.{Failure, Success}
 
    val bot = new RenfeBot(token,adminId)
 
-   case class AddTripToDao(user: BotUser, trip: Trip)
-   case class RemoveTripFromDao(user: BotUser, trip: Trip)
+   case class AddTripToDao(user: BotUser, trip: Journey)
+   case class RemoveTripFromDao(user: BotUser, trip: Journey)
    case object CleanDao
 
  }

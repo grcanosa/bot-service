@@ -3,45 +3,48 @@ package com.grcanosa.bots.renfebot.renfe
 
 
 import java.net.URL
+import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
+import java.time.{LocalDate, LocalDateTime, LocalTime, ZoneOffset}
+
 import scala.concurrent.duration._
-import com.grcanosa.bots.renfebot.model.Trip
+import com.grcanosa.bots.renfebot.model.{Journey, Trip}
 import org.openqa.selenium.{By, Keys, WebElement}
 import org.openqa.selenium.remote.{BrowserType, DesiredCapabilities, RemoteWebDriver}
 import org.openqa.selenium.support.ui.WebDriverWait
+
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration.FiniteDuration
 import scala.util.Try
 
 class RenfeChecker(val driverUrl: String)(implicit ec: ExecutionContext) {
-
+  val hourFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("HH.mm")
+  val dateFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
   val chrome = new DesiredCapabilities()
   chrome.setBrowserName(BrowserType.CHROME)
 
-  implicit val driver = new RemoteWebDriver(new URL("http://localhost:6666/wd/hub"), chrome)
+  implicit val driver: RemoteWebDriver = new RemoteWebDriver(new URL(driverUrl), chrome)
 
-  def checkTrip(trip: Trip)
-               (implicit driver: RemoteWebDriver) = {
+  def checkTrip(trip: Journey): Future[Seq[Trip]] = {
     Future{
       val origin = trip.origin
       val destination = trip.destination
       val date = trip.departureDate
-
+      implicit val localDate:LocalDate = LocalDate.parse(date,dateFormat)
+      driver.get("https://www.renfe.com")
       fillElements(origin, destination, date)
       val go_bt = driver.findElementByClassName("btn_home")
       go_bt.click()
       waitForElementById("tab-mensaje_contenido", 30 seconds) match {
-        case false => {
-          println("cannot get")
-          ???
-        }
-        case true => getTrainsIfPossible()
+        case false => Seq.empty[Trip]
+        case true => getTrainsIfPossible().sortBy(_.departureTimestamp)
       }
     }
   }
 
-  def waitForElementById(id: String,timeout: FiniteDuration)
-                        (implicit driver: RemoteWebDriver): Boolean = {
+  def waitForElementById(id: String,timeout: FiniteDuration): Boolean = {
     Try{
       val wait = new WebDriverWait(driver,timeout.toSeconds)
       val b: WebElement = wait.until(driver => driver.findElement(By.id(id)))
@@ -49,7 +52,7 @@ class RenfeChecker(val driverUrl: String)(implicit ec: ExecutionContext) {
     }.getOrElse(false)
   }
 
-  def fillElement(element_id: String, data: String)(implicit driver: RemoteWebDriver) = {
+  def fillElement(element_id: String, data: String) = {
     val el = driver.findElementById(element_id)
     el.clear()
     el.sendKeys(data)
@@ -57,109 +60,60 @@ class RenfeChecker(val driverUrl: String)(implicit ec: ExecutionContext) {
     el.sendKeys(Keys.ENTER)
   }
 
-  def fillElements(origen: String, destino: String,fecha: String)(implicit driver:RemoteWebDriver) = {
+  def fillElements(origen: String, destino: String,fecha: String) = {
     fillElement("IdDestino",destino)
     fillElement("IdOrigen",origen)
     fillElement("__fechaIdaVisual",fecha)
   }
 
-  def getTrainsIfPossible()(implicit driver: RemoteWebDriver) = {
+  def getTrainsIfPossible()(implicit date: LocalDate): Seq[Trip] = {
     val el = driver.findElementById("tab-mensaje_contenido")
     el.getText contains "no se encuentra disponible" match {
-      case true => {
-
-        ???
-      }
-      case false => getTrains()
+      case true => Seq.empty[Trip]
+      case false => getTrips()
     }
   }
 
-  def getTrains()(implicit driver: RemoteWebDriver) = {
+
+
+  def getTrips()(implicit date: LocalDate): Seq[Trip] = {
     //Thread.sleep(30000)
     val wait = new WebDriverWait(driver,30)
-    wait.until(dr => dr.findElements(By.id("listaTrenesTBodyIda")))
+    wait.until(dr => dr.findElements(By.xpath(".//tr[contains(@class,'trayectoRow')]")))
     val trenes = driver.findElementById("listaTrenesTBodyIda")
     val rows =  trenes.findElements(By.xpath(".//tr[contains(@class,'trayectoRow')]"))
-    println(s"size is ${rows.size()}")
     rows.asScala.map{ el:WebElement =>
-      val salida = el.findElement(By.xpath(".//td[@headers='colSalida']")).getText
-      val llegada = el.findElement(By.xpath(".//td[@headers='colLlegada']")).getText
-      println(salida, llegada)
-      ???
+      val salida: String = el.findElement(By.xpath(".//td[@headers='colSalida']")).getText
+      val llegada: String = el.findElement(By.xpath(".//td[@headers='colLlegada']")).getText
+      val tipo = Try{el.findElement(By.xpath(".//td[@headers='colTren']")).getText}.toOption
+      val clase = Try{el.findElement(By.xpath(".//td[@headers='colClase']//span")).getAttribute("innerHTML")}.toOption
+      val tarifa = Try{el.findElement(By.xpath(".//td[@headers='colTarifa']//span")).getAttribute("innerHTML")}.toOption
 
-      //salT = datetime.datetime.strptime(sal, '%H.%M').time()
-      //  //  lleT = datetime.datetime.strptime(lle, '%H.%M').time()
-      //  //  toSec = lambda x: x.hour*60*60+x.minute*60+x.second
-      //  //  dur = toSec(lleT)-toSec(salT)
-      //  //  tipo = r.find_element_by_xpath(".//td[@headers='colTren']").text
-      //  //  disp = not "Completo" in r.text and not "disponible" in r.text
-      //  //  precio=""
-      //  //  clase=""
-      //  //  tarifa=""
-      //  //  if disp:
-      //  //    precio = r.find_element_by_xpath(".//td[@headers='colPrecio']").text
-      //  //  precio = float(precio.split()[0].replace(",","."))
-      //  //  clase = r.find_element_by_xpath(".//td[@headers='colClase']//span").get_attribute("innerHTML")
-      //  //  tarifa = r.find_element_by_xpath(".//td[@headers='colTarifa']//span").get_attribute("innerHTML")
-      //  //  trayectos.append({"SALIDA":salT,"LLEGADA":lleT,"TIPO":tipo,"PRECIO":precio,"DURACION":float(dur)/3600,"CLASE":clase,"TARIFA":tarifa,"DISPONIBLE":disp})
-
+      val timeSalida = LocalTime.parse(salida,hourFormat)
+      val timeLlegada = LocalTime.parse(llegada,hourFormat)
+      val dateTimeSalida = LocalDateTime.of(date,timeSalida)
+      val dateTimeLlegada = LocalDateTime.of(date,timeLlegada)
+      val duration: Long = dateTimeSalida.until(dateTimeLlegada,ChronoUnit.MINUTES) match {
+        case d if d >= 0 => d
+        case d if d < 0 => (24*60) + d
+      }
+      val disp = (! el.getText.contains("Completo")) && (! el.getText.contains("disponible"))
+      val precio: Option[String] = disp match {
+        case true => Some(el.findElement(By.xpath(".//td[@headers='colPrecio']")).getText)
+        case false => None
+        }
+      Trip(
+        dateTimeSalida.toEpochSecond(ZoneOffset.UTC)
+        , duration
+        , salida
+        , llegada
+        , disp
+        , precio.map(_.split(' ').head.toFloat)
+        , tipo
+        , clase
+        , tarifa
+      )
     }
   }
 
 }
-
-//
-//  //  def getTrains(driver):
-//  //  trayectos = []
-//  //  trenes = driver.find_element_by_id("listaTrenesTBodyIda")
-//  //  rows = trenes.find_elements_by_xpath(".//tr[contains(@class,'trayectoRow')]")
-//  //  logger.info("SIZE: "+str(len(rows)))
-//  //  # rows = rows + trenes.find_elements_by_xpath(".//tr[@class='trayectoRow row_alt']")
-//  //  # rows = rows + trenes.find_elements_by_xpath(".//tr[@class='trayectoRow last']")
-//  //  for r in rows:
-//  //    sal = r.find_element_by_xpath(".//td[@headers='colSalida']").text
-//  //  lle = r.find_element_by_xpath(".//td[@headers='colLlegada']").text
-//  //  salT = datetime.datetime.strptime(sal, '%H.%M').time()
-//  //  lleT = datetime.datetime.strptime(lle, '%H.%M').time()
-//  //  toSec = lambda x: x.hour*60*60+x.minute*60+x.second
-//  //  dur = toSec(lleT)-toSec(salT)
-//  //  tipo = r.find_element_by_xpath(".//td[@headers='colTren']").text
-//  //  disp = not "Completo" in r.text and not "disponible" in r.text
-//  //  precio=""
-//  //  clase=""
-//  //  tarifa=""
-//  //  if disp:
-//  //    precio = r.find_element_by_xpath(".//td[@headers='colPrecio']").text
-//  //  precio = float(precio.split()[0].replace(",","."))
-//  //  clase = r.find_element_by_xpath(".//td[@headers='colClase']//span").get_attribute("innerHTML")
-//  //  tarifa = r.find_element_by_xpath(".//td[@headers='colTarifa']//span").get_attribute("innerHTML")
-//  //  trayectos.append({"SALIDA":salT,"LLEGADA":lleT,"TIPO":tipo,"PRECIO":precio,"DURACION":float(dur)/3600,"CLASE":clase,"TARIFA":tarifa,"DISPONIBLE":disp})
-//  //  #logger.info(trayectos)
-//  //  logger.debug("Returning arrary")
-//  //  return trayectos
-//
-//
-//
-//  def checkTrip(origen: String, destino: String, fecha: String)(implicit driver: RemoteWebDriver) = {
-//  fillElements(origen,destino,fecha)
-//  val go_bt = driver.findElementByClassName("btn_home")
-//  go_bt.click()
-//  waitForElementById("tab-mensaje_contenido", 30 seconds) match {
-//  case false => {
-//  println("cannot get")
-//  Seq.empty[TripResult]
-//}
-//  case true => getTrainsIfPossible()
-//}
-//
-//}
-//
-//
-//  checkTrip("MADRID-PUERTA DE ATOCHA","SEVILLA-SANTA JUSTA","16/03/2020")
-//
-//  //"http://localhost:9515", DesiredCapabilities.chrome)
-//
-//  //  driver = webdriver.Remote(command_executor="",desired_capabilities=DesiredCapabilities.CHROME)
-//  //  driver.set_page_load_timeout(60)
-//
-//}

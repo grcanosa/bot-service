@@ -1,6 +1,11 @@
 package com.grcanosa.bots.renfebot.model
 
-case class Trip(origin: String,
-                destination: String,
-                departureDate: String,
-                returnDate: Option[String])
+case class Trip(departureTimestamp: Long,
+                durationMinutes: Long,
+                departureHour: String,
+                arrivalHour: String,
+                disponible: Boolean,
+                price: Option[Float],
+                tipo: Option[String],
+                clase: Option[String],
+                tarifa: Option[String])

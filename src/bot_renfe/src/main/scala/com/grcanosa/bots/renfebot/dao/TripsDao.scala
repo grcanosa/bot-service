@@ -1,7 +1,7 @@
 package com.grcanosa.bots.renfebot.dao
 
 import com.grcanosa.bots.renfebot.dao.TripsDao.TripMongo
-import com.grcanosa.bots.renfebot.model.Trip
+import com.grcanosa.bots.renfebot.model.Journey
 import com.grcanosa.telegrambot.dao.mongo.MongoResultsMappings
 import com.grcanosa.telegrambot.model.BotUser
 import org.bson.codecs.configuration.CodecRegistries.{fromProviders, fromRegistries}
@@ -17,14 +17,14 @@ object TripsDao {
 
   case class TripMongo(userId: Long,
                        active: Boolean,
-                      trip: Trip)
+                      trip: Journey)
 
 
-  def toTripMongo(botUser: BotUser,trip:Trip) = {
+  def toTripMongo(botUser: BotUser,trip:Journey) = {
     TripMongo(botUser.id,true,trip)
   }
 
-  val trip2Tuple = (trip: Trip) => (trip.origin,trip.destination,trip.departureDate,trip.returnDate)
+  val trip2Tuple = (trip: Journey) => (trip.origin,trip.destination,trip.departureDate,trip.returnDate)
 
   type TripMapType = Map[(String,String,String,Option[String]), Set[Long]]
 
@@ -67,7 +67,7 @@ class TripsDao(val host: String
 
   private lazy val trips: MongoCollection[TripMongo] = database.getCollection("trips")
 
-  def addTrip(user: BotUser,trip:Trip) = {
+  def addTrip(user: BotUser,trip:Journey) = {
     trips.insertOne(toTripMongo(user,trip)).toBooleanFuture()
   }
 
@@ -75,7 +75,7 @@ class TripsDao(val host: String
     trips.find(equal("userId",user.id)).toFuture().map(_.map(_.trip))
   }
 
-  def removeTrip(user: BotUser, trip: Trip) = {
+  def removeTrip(user: BotUser, trip: Journey) = {
     trips.findOneAndUpdate(and(
       equal("userId",user.id),
       equal("trip",trip)
