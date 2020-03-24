@@ -31,9 +31,10 @@ object RenfeBotUser {
 
   val START_USER_STATE = RenfeBotUserState(START_STATE,NO_ACTION,None,None,None)
 
+  case class RenfeBotEventResponse(renfeBotUser: RenfeBotUser, responses: Seq[Any])
 
   def apply(botUser: BotUser) = {
-    new RenfeBotUser(botUser,START_USER_STATE,Seq.empty)
+    new RenfeBotUser(botUser,START_USER_STATE)
   }
 
 
@@ -41,20 +42,26 @@ object RenfeBotUser {
 
 class RenfeBotUser(val botUser: BotUser
                    , val state: RenfeBotUserState
-                   , val responses: Seq[Any]) {
+                   ) {
 
   import RenfeBotUser._
   import com.grcanosa.bots.renfebot.bot.RenfeBotData._
 
-  def menuMessage(): RenfeBotUser = {
-    new RenfeBotUser(botUser, START_USER_STATE,Seq(SendMessage(botUser.id,menuText,replyMarkup = Some(menuKeyboard))))
+  def menuMessage(): RenfeBotEventResponse = {
+    RenfeBotEventResponse(
+    new RenfeBotUser(botUser, START_USER_STATE)
+      ,Seq(SendMessage(botUser.id,menuText,replyMarkup = Some(menuKeyboard)))
+    )
   }
 
-  def cancelMessage(): RenfeBotUser = {
-    new RenfeBotUser(botUser, START_USER_STATE,Seq(SendMessage(botUser.id,cancelText,replyMarkup = Some(removeKeyboard))))
+  def cancelMessage(): RenfeBotEventResponse = {
+    RenfeBotEventResponse(
+    new RenfeBotUser(botUser, START_USER_STATE)
+      ,Seq(SendMessage(botUser.id,cancelText,replyMarkup = Some(removeKeyboard)))
+    )
   }
 
-  def processMessage(msg: Message): RenfeBotUser = {
+  def processMessage(msg: Message): RenfeBotEventResponse = {
     state.state match {
       case START_STATE => processMessageStartState(msg)
       case SELECT_ORIGIN_STATE => processOriginStation(msg)
@@ -63,12 +70,15 @@ class RenfeBotUser(val botUser: BotUser
     }
   }
 
-  private def processOriginStation(msg: Message) = {
+  private def processOriginStation(msg: Message): RenfeBotEventResponse = {
     msg.text match {
-      case None => new RenfeBotUser(botUser,state,Seq(SendMessage(botUser.id,respuestaNoValidaText)))
-      case Some(txt) =>
+      case None => RenfeBotEventResponse(
+        new RenfeBotUser(botUser,state)
+        ,Seq(SendMessage(botUser.id,respuestaNoValidaText))
+      )
+      case Some(txt) => RenfeBotEventResponse(
         new RenfeBotUser(botUser
-        , state.copy(state = SELECT_DEST_STATE,origin = Some(txt))
+        , state.copy(state = SELECT_DEST_STATE,origin = Some(txt)))
         , Seq(
             SendMessage(botUser.id,selectDestText,replyMarkup = Some(stationsKeyboard))
           )
@@ -76,12 +86,17 @@ class RenfeBotUser(val botUser: BotUser
     }
   }
 
-  private def processDestStation(msg: Message) = {
+  private def processDestStation(msg: Message): RenfeBotEventResponse = {
     msg.text match {
-      case None => new RenfeBotUser(botUser,state,Seq(SendMessage(botUser.id,respuestaNoValidaText)))
+      case None => RenfeBotEventResponse(
+        new RenfeBotUser(botUser,state)
+        ,Seq(SendMessage(botUser.id,respuestaNoValidaText))
+      )
       case Some(txt) =>
+        RenfeBotEventResponse(
         new RenfeBotUser(botUser
           , state.copy(state = SELECT_DATE_STATE,dest = Some(txt))
+        )
           , Seq(
             SendMessage(botUser.id,selectedTripOriginDeparture(state.origin.getOrElse(""),state.dest.getOrElse("")))
             , SendMessage(botUser.id,selectDateText,replyMarkup = Some(createCalendar()))
@@ -92,20 +107,25 @@ class RenfeBotUser(val botUser: BotUser
 
   val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
-  def processKeyboardCallbackData(messageId: Int,data: String): RenfeBotUser = {
+  def processKeyboardCallbackData(messageId: Int,data: String): RenfeBotEventResponse = {
     processCallbackData(data) match {
-      case (None, None) => new RenfeBotUser(botUser,state,Seq.empty)
-      case (Some(newKeyboard), None) => new RenfeBotUser(botUser,state,Seq(
+      case (None, None) => RenfeBotEventResponse(new RenfeBotUser(botUser,state),Seq.empty)
+      case (Some(newKeyboard), None) => RenfeBotEventResponse(
+        new RenfeBotUser(botUser,state)
+        ,Seq(
         EditMessageReplyMarkup(Some(botUser.id),Some(messageId),replyMarkup = Some(newKeyboard))
-      ))
+        )
+      )
       case (None, Some(date)) => processDate(date.format(dateFormatter))
-      case _ => new RenfeBotUser(botUser,state,Seq.empty)
+      case _ => RenfeBotEventResponse(new RenfeBotUser(botUser,state),Seq.empty)
     }
   }
 
-  private def processDate(date: String): RenfeBotUser = {
+  private def processDate(date: String): RenfeBotEventResponse = {
+    RenfeBotEventResponse(
     new RenfeBotUser(botUser,
-      START_USER_STATE,
+      START_USER_STATE)
+      ,
       Seq(
         SendMessage(botUser.id,selectedTripFull(state.origin.get,state.dest.get,date),replyMarkup = Some(removeKeyboard))
       )
@@ -113,15 +133,18 @@ class RenfeBotUser(val botUser: BotUser
   }
 
 
-  private def processMessageStartState(msg: Message): RenfeBotUser = {
+  private def processMessageStartState(msg: Message): RenfeBotEventResponse = {
     msg.text match {
       case Some(ConsultaAhoraMenuText) => {
+        RenfeBotEventResponse(
         new RenfeBotUser(botUser
           , state.copy(state = SELECT_ORIGIN_STATE, action = CONSULTA_AHORA)
+        )
           , Seq(
             SendMessage(botUser.id,hacerConsultaAhoraText,replyMarkup = Some(removeKeyboard))
             , SendMessage(botUser.id,selectOriginText,replyMarkup = Some(stationsKeyboard))
-          ))
+          )
+        )
       }
       case Some(ConsultaPeriodicaMenuText) => {
         ???
@@ -133,7 +156,10 @@ class RenfeBotUser(val botUser: BotUser
         ???
       }
       case None => {
-        new RenfeBotUser(botUser,state,Seq(SendMessage(botUser.id,respuestaNoValidaText)))
+        RenfeBotEventResponse(
+        new RenfeBotUser(botUser,state)
+          ,Seq(SendMessage(botUser.id,respuestaNoValidaText))
+        )
       }
     }
   }

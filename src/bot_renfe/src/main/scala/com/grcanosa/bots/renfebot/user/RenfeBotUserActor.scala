@@ -24,23 +24,27 @@ class RenfeBotUserActor(val botUser: BotUser,val botActor: ActorRef) extends Act
 
   override def receive = {
     case MenuCommand => {
-      renfeBotUser = renfeBotUser.menuMessage()
-      renfeBotUser.responses.foreach(botActor ! _)
+      val resp = renfeBotUser.menuMessage()
+      renfeBotUser = resp.renfeBotUser
+      resp.responses.foreach(botActor ! _)
 
     }
     case CancelCommand => {
-      renfeBotUser = renfeBotUser.cancelMessage()
-      renfeBotUser.responses.foreach(botActor ! _)
+      val resp = renfeBotUser.cancelMessage()
+      renfeBotUser = resp.renfeBotUser
+      resp.responses.foreach(botActor ! _)
     }
 
     case msg: Message => {
-      renfeBotUser = renfeBotUser.processMessage(msg)
-      renfeBotUser.responses.foreach(botActor ! _)
+      val resp = renfeBotUser.processMessage(msg)
+      renfeBotUser = resp.renfeBotUser
+      resp.responses.foreach(botActor ! _)
     }
 
     case KeyboardCallbackData(messageId,data) => {
-      renfeBotUser = renfeBotUser.processKeyboardCallbackData(messageId,data)
-      renfeBotUser.responses.foreach(botActor ! _)
+      val resp = renfeBotUser.processKeyboardCallbackData(messageId,data)
+      renfeBotUser = resp.renfeBotUser
+      resp.responses.foreach(botActor ! _)
     }
   }
 

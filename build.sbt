@@ -57,7 +57,18 @@ lazy val bot_grupo = project
     library
   )
 
-
+lazy val bot_codigosecreto = project
+  .in(file("src/bot_codigosecreto"))
+  .enablePlugins(PackagingTypePlugin)
+  .disablePlugins(AssemblyPlugin)
+  .settings(
+    name := "bot_codigosecreto",
+    libraryDependencies ++= testDeps,
+    libraryDependencies += "org.creativescala" %% "doodle" % "0.9.15"
+  )
+  .dependsOn(
+    library
+  )
 
 lazy val bot_renfe = project
   .in(file("src/bot_renfe"))
@@ -88,6 +99,7 @@ lazy val bot_apps = project
      bot_grcanosa
     , bot_grupo
     , bot_renfe
+    , bot_codigosecreto
   )
 
 val telegramBotVersion = "4.0.0-RC2"

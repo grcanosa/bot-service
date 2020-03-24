@@ -3,7 +3,7 @@ package com.grcanosa.bots.renfebot.renfe
 
 
 import java.net.URL
-
+import scala.concurrent.duration._
 import com.grcanosa.bots.renfebot.model.Trip
 import org.openqa.selenium.{By, Keys, WebElement}
 import org.openqa.selenium.remote.{BrowserType, DesiredCapabilities, RemoteWebDriver}
@@ -33,7 +33,7 @@ class RenfeChecker(val driverUrl: String)(implicit ec: ExecutionContext) {
       waitForElementById("tab-mensaje_contenido", 30 seconds) match {
         case false => {
           println("cannot get")
-          Seq.empty[TripResult]
+          ???
         }
         case true => getTrainsIfPossible()
       }
