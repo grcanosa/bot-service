@@ -13,7 +13,7 @@ object TestRenfeChecker extends App with AkkaDefaults{
   val renfeChecker = new RenfeChecker(driver2Url)
 
   val journey = Journey("MADRID-PUERTA DE ATOCHA","SEVILLA-SANTA JUSTA", "01/04/2020",None)
-  renfeChecker.checkTrip(journey).onComplete{
+  renfeChecker.checkJourney(journey).onComplete{
     case Success(v) => v.foreach(println)
     case Failure(e) => println(e)
   }

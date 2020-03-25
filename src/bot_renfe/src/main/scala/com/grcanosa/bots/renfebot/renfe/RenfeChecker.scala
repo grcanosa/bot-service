@@ -3,7 +3,6 @@ package com.grcanosa.bots.renfebot.renfe
 
 
 import java.net.URL
-import java.text.SimpleDateFormat
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.time.{LocalDate, LocalDateTime, LocalTime, ZoneOffset}
@@ -27,8 +26,7 @@ class RenfeChecker(val driverUrl: String)(implicit ec: ExecutionContext) {
 
   implicit val driver: RemoteWebDriver = new RemoteWebDriver(new URL(driverUrl), chrome)
 
-  def checkTrip(trip: Journey): Future[Seq[Trip]] = {
-    Future{
+  def checkJourney(trip: Journey): Seq[Trip] = {
       val origin = trip.origin
       val destination = trip.destination
       val date = trip.departureDate
@@ -41,7 +39,6 @@ class RenfeChecker(val driverUrl: String)(implicit ec: ExecutionContext) {
         case false => Seq.empty[Trip]
         case true => getTrainsIfPossible().sortBy(_.departureTimestamp)
       }
-    }
   }
 
   def waitForElementById(id: String,timeout: FiniteDuration): Boolean = {
@@ -52,7 +49,7 @@ class RenfeChecker(val driverUrl: String)(implicit ec: ExecutionContext) {
     }.getOrElse(false)
   }
 
-  def fillElement(element_id: String, data: String) = {
+  private def fillElement(element_id: String, data: String) = {
     val el = driver.findElementById(element_id)
     el.clear()
     el.sendKeys(data)
@@ -60,13 +57,13 @@ class RenfeChecker(val driverUrl: String)(implicit ec: ExecutionContext) {
     el.sendKeys(Keys.ENTER)
   }
 
-  def fillElements(origen: String, destino: String,fecha: String) = {
+  private def fillElements(origen: String, destino: String,fecha: String) = {
     fillElement("IdDestino",destino)
     fillElement("IdOrigen",origen)
     fillElement("__fechaIdaVisual",fecha)
   }
 
-  def getTrainsIfPossible()(implicit date: LocalDate): Seq[Trip] = {
+  private def getTrainsIfPossible()(implicit date: LocalDate): Seq[Trip] = {
     val el = driver.findElementById("tab-mensaje_contenido")
     el.getText contains "no se encuentra disponible" match {
       case true => Seq.empty[Trip]
@@ -76,7 +73,7 @@ class RenfeChecker(val driverUrl: String)(implicit ec: ExecutionContext) {
 
 
 
-  def getTrips()(implicit date: LocalDate): Seq[Trip] = {
+  private def getTrips()(implicit date: LocalDate): Seq[Trip] = {
     //Thread.sleep(30000)
     val wait = new WebDriverWait(driver,30)
     wait.until(dr => dr.findElements(By.xpath(".//tr[contains(@class,'trayectoRow')]")))

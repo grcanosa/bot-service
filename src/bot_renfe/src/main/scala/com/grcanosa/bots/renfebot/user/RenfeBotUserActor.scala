@@ -2,6 +2,7 @@ package com.grcanosa.bots.renfebot.user
 
 import akka.actor.{Actor, ActorRef}
 import com.bot4s.telegram.models.Message
+import com.grcanosa.bots.renfebot.model.JourneyCheck
 import com.grcanosa.telegrambot.model.BotUser
 
 
@@ -45,6 +46,10 @@ class RenfeBotUserActor(val botUser: BotUser,val botActor: ActorRef) extends Act
       val resp = renfeBotUser.processKeyboardCallbackData(messageId,data)
       renfeBotUser = resp.renfeBotUser
       resp.responses.foreach(botActor ! _)
+    }
+
+    case JourneyCheck(journey,results) => {
+
     }
   }
 

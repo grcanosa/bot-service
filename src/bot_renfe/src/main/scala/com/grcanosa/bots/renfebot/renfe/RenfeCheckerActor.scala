@@ -1,20 +1,29 @@
 package com.grcanosa.bots.renfebot.renfe
 
-import akka.actor.Actor
-import com.grcanosa.bots.renfebot.model.Journey
-import com.grcanosa.bots.renfebot.renfe.RenfeCheckerActor.CheckTrip
+import akka.actor.{Actor, ActorContext, ActorRef}
+import com.grcanosa.bots.renfebot.model.{Journey, JourneyCheck, Trip}
+import com.grcanosa.bots.renfebot.renfe.RenfeCheckerActor.CheckJourney
+import com.grcanosa.telegrambot.model.BotUser
 
 object RenfeCheckerActor{
 
-  case class CheckTrip(trip: Journey, users: Set[Long])
+  case class CheckJourney(trip: Journey, users: Seq[ActorRef])
 
 }
 
-class RenfeCheckerActor extends Actor {
+class RenfeCheckerActor(val driverUrl: String) extends Actor {
+
+  implicit val ec = context.dispatcher
+
+  val renfeChecker = new RenfeChecker(driverUrl)
 
   override def receive = {
-    case CheckTrip(trip,users) => {
-
+    case CheckJourney(journey,users) => {
+      val res: Seq[Trip] = renfeChecker.checkJourney(journey)
+      val journeyCheck = JourneyCheck(journey,res)
+      users.foreach{ botUser =>
+        botUser ! journeyCheck
+      }
     }
 
   }
