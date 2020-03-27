@@ -25,7 +25,5 @@ class RenfeCheckerActor(val driverUrl: String) extends Actor {
         botUser ! journeyCheck
       }
     }
-
   }
-
 }

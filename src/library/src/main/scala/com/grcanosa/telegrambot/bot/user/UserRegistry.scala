@@ -26,16 +26,20 @@ trait UserRegistry extends BotDao with LazyBotLogging{
   def permittedUserHandlers =
     userHandlers.filter(_._2.user.permission == PERMISSION_ALLOWED).values.toSeq
 
-  botUserDao.getUsers().onComplete{
-    case Failure(exception) => botlog.error(s"Error getting users ${exception.toString}")
-    case Success(seqU) => seqU match {
-      case Seq() => botlog.info("Empty user list retrived from database")
-      case _ => seqU.foreach{ bu =>
-        botlog.info(s"Loading user: ${bu.id.toString}, ${bu.name} with permission: ${bu.permission.toString}")
-        userHandlers.update(bu.id,UserHandler(bu,createNewUserActor(bu)))
+  def loadUsersAndCreateActorsFromDao() = {
+    botUserDao.getUsers().onComplete{
+      case Failure(exception) => botlog.error(s"Error getting users ${exception.toString}")
+      case Success(seqU) => seqU match {
+        case Seq() => botlog.info("Empty user list retrived from database")
+        case _ => seqU.foreach{ bu =>
+          botlog.info(s"Loading user: ${bu.id.toString}, ${bu.name} with permission: ${bu.permission.toString}")
+          userHandlers.update(bu.id,UserHandler(bu,createNewUserActor(bu)))
+        }
       }
     }
   }
+
+
 
   def getUser(uid: Long) = {
     userHandlers.get(uid)

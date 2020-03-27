@@ -25,6 +25,8 @@ object BotUtils {
   implicit class StringHelper(s: String){
     def emojize: String = EmojiParser.parseToUnicode(s)
 
+    def botmessage: String = EmojiParser.parseToUnicode(":robot_face::speech_balloon: "+s)
+
     def getFileLinesAsSeq = {
       Try {
         val buff = Source.fromFile(s)

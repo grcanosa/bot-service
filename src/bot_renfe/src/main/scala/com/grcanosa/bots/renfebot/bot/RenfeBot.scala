@@ -15,7 +15,7 @@ import com.grcanosa.telegrambot.bot.BotWithAdmin
 import com.grcanosa.telegrambot.dao.mongo.{BotUserMongoDao, InteractionMongoDao}
 import com.grcanosa.telegrambot.dao.{BotDao, BotUserDao, InteractionDao}
 import com.grcanosa.telegrambot.model.BotUser
-import com.grcanosa.telegrambot.utils.CalendarKeyboard
+import com.grcanosa.telegrambot.utils.{CalendarKeyboard, LazyBotLogging}
 import com.typesafe.config.ConfigFactory
 
 import scala.concurrent.duration._
@@ -62,10 +62,13 @@ import scala.util.{Failure, Success}
                   (implicit botDao: BotDao, tripsDao: TripsDao)
    extends BotWithAdmin(token,adminId)
  with Callbacks
- with CalendarKeyboard{
+ with CalendarKeyboard
+ with LazyBotLogging{
 
    import RenfeBotData._
    import RenfeBotUserActor._
+
+   botlog.info("Created Bot")
 
    onCommand("/menu"){ implicit msg =>
      allowedUser(Some("menu")){ uH =>
@@ -89,8 +92,9 @@ import scala.util.{Failure, Success}
 
 
    onCallbackWithTag(KEYBOARD_TAG){ implicit cbk =>
+     botlog.info(s"Callback with tag: $KEYBOARD_TAG, data: ${cbk.data}")
     cbk.message.foreach{ implicit msg =>
-      allowedUser(Some("keyboard_callback")){ uH =>
+      getUser(msg.chat.id).foreach{ uH =>
         cbk.data.foreach{ data =>
           uH.handler ! KeyboardCallbackData(msg.messageId,data)
         }
@@ -99,11 +103,11 @@ import scala.util.{Failure, Success}
    }
 
 
-   system.scheduler.schedule(0 seconds, 24 hours){
+   system.scheduler.schedule(30 seconds, 24 hours){
      botActor ! CleanDao
    }
 
-   val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+   val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
    override def additionalReceive: ActorReceive = {
      case AddTripToDao(user, trip) => {
@@ -131,6 +135,7 @@ import scala.util.{Failure, Success}
 
 
    override def createNewUserActor(botUser: BotUser): ActorRef = {
+     botlog.info(s"Creating actor for user: $botUser with botActor $botActor")
      system.actorOf(Props(new RenfeBotUserActor(botUser,botActor)),s"actor_${botUser.id}")
    }
 

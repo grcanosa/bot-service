@@ -24,7 +24,7 @@ trait CalendarKeyboard {
 
   lazy val ignoreCallbakData: Option[String] = createCallbackData(IGNORE_ACTION,"Y","M","D")
 
-  lazy val emptyButton: InlineKeyboardButton = InlineKeyboardButton("X",ignoreCallbakData)
+  lazy val emptyButton: InlineKeyboardButton = InlineKeyboardButton(" ",ignoreCallbakData)
 
 
   lazy val weekButtons: Seq[InlineKeyboardButton] =
@@ -86,7 +86,7 @@ trait CalendarKeyboard {
 
     val lastWeek = grouped.last.size match {
       case 7 => grouped.last
-      case n => grouped.last ++ (0 to 7-n).map(_ => emptyButton)
+      case n => grouped.last ++ (1 to 7-n).map(_ => emptyButton)
     }
 
     //Keep all but last week

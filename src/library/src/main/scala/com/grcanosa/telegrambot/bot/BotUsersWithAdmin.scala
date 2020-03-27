@@ -1,6 +1,6 @@
 package com.grcanosa.telegrambot.bot
 
-
+import scala.concurrent.duration._
 import com.bot4s.telegram.api.AkkaDefaults
 import com.bot4s.telegram.api.declarative.Action
 import com.bot4s.telegram.models.Message
@@ -22,6 +22,9 @@ with LazyBotLogging{
 
   def userRequestPermission(userH: UserHandler)
 
+  system.scheduler.scheduleOnce(5 seconds){
+    loadUsersAndCreateActorsFromDao()
+  }
 
   def addInteraction(interaction: Option[String])(implicit msg: Message) = {
     interaction.foreach{ s =>

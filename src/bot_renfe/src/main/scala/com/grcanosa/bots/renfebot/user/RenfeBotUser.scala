@@ -6,6 +6,7 @@ import com.bot4s.telegram.methods.{EditMessageReplyMarkup, SendMessage}
 import com.bot4s.telegram.models.{Message, ReplyMarkup}
 import com.grcanosa.bots.renfebot.user.RenfeBotUser.{RenfeBotUserState, START_STATE, UserState}
 import com.grcanosa.telegrambot.model.BotUser
+import com.grcanosa.telegrambot.utils.LazyBotLogging
 
 object RenfeBotUser {
 
@@ -42,7 +43,7 @@ object RenfeBotUser {
 
 class RenfeBotUser(val botUser: BotUser
                    , val state: RenfeBotUserState
-                   ) {
+                   ) extends LazyBotLogging {
 
   import RenfeBotUser._
   import com.grcanosa.bots.renfebot.bot.RenfeBotData._
@@ -71,6 +72,7 @@ class RenfeBotUser(val botUser: BotUser
   }
 
   private def processOriginStation(msg: Message): RenfeBotEventResponse = {
+    botlog.info(s"Select ${msg.text} as origin station")
     msg.text match {
       case None => RenfeBotEventResponse(
         new RenfeBotUser(botUser,state)
@@ -87,6 +89,7 @@ class RenfeBotUser(val botUser: BotUser
   }
 
   private def processDestStation(msg: Message): RenfeBotEventResponse = {
+    botlog.info(s"Select ${msg.text} as dest station")
     msg.text match {
       case None => RenfeBotEventResponse(
         new RenfeBotUser(botUser,state)
@@ -98,16 +101,17 @@ class RenfeBotUser(val botUser: BotUser
           , state.copy(state = SELECT_DATE_STATE,dest = Some(txt))
         )
           , Seq(
-            SendMessage(botUser.id,selectedTripOriginDeparture(state.origin.getOrElse(""),state.dest.getOrElse("")))
+            SendMessage(botUser.id,selectedTripOriginDepartureText(state.origin.getOrElse(""),txt),replyMarkup = Some(removeKeyboard))
             , SendMessage(botUser.id,selectDateText,replyMarkup = Some(createCalendar()))
           )
         )
     }
   }
 
-  val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+  val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
   def processKeyboardCallbackData(messageId: Int,data: String): RenfeBotEventResponse = {
+    botlog.info(s"Processing callback data $data")
     processCallbackData(data) match {
       case (None, None) => RenfeBotEventResponse(new RenfeBotUser(botUser,state),Seq.empty)
       case (Some(newKeyboard), None) => RenfeBotEventResponse(
@@ -127,7 +131,7 @@ class RenfeBotUser(val botUser: BotUser
       START_USER_STATE)
       ,
       Seq(
-        SendMessage(botUser.id,selectedTripFull(state.origin.get,state.dest.get,date),replyMarkup = Some(removeKeyboard))
+        SendMessage(botUser.id,selectedTripFullText(state.origin.get,state.dest.get,date),replyMarkup = Some(removeKeyboard))
       )
     )
   }
@@ -154,6 +158,13 @@ class RenfeBotUser(val botUser: BotUser
       }
       case Some(VerConsultaPeriodicaMenuText) => {
         ???
+      }
+      case Some(_) => {
+        botlog.info(s"Received unexpected message")
+        RenfeBotEventResponse(
+          this,
+          Seq(SendMessage(botUser.id,respuestaNoValidaText,replyMarkup = Some(removeKeyboard)))
+        )
       }
       case None => {
         RenfeBotEventResponse(

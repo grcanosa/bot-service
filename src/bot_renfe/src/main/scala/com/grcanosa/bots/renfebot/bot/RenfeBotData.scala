@@ -49,9 +49,9 @@ object RenfeBotData extends CalendarKeyboard{
   lazy val selectDestText = "Introduce estación destino :train2:".emojize
   lazy val selectDateText = "Elige ahora la fecha del viaje :calendar:".emojize
 
-  lazy val selectedTripOriginDeparture = (ori: String, dest: String) => s"Has seleccionado el trayecto $ori -> $dest.".emojize
+  lazy val selectedTripOriginDepartureText = (ori: String, dest: String) => s"Has seleccionado el trayecto $ori -> $dest.".emojize
 
-  lazy val selectedTripFull = (ori: String, dest: String, date: String) => s"Has seleccionado el trayecto $ori -> $dest para el dia $date".emojize
+  lazy val selectedTripFullText = (ori: String, dest: String, date: String) => s"Has seleccionado el trayecto $ori -> $dest para el dia $date".emojize
 
   lazy val tripAddedText = s"TRIP ADDED".emojize
 
@@ -61,17 +61,17 @@ object RenfeBotData extends CalendarKeyboard{
 
   lazy val tripRemovedErrorText = s"TRIP ERROR REMOVED".emojize
 
-  lazy val tripDaoCleanText = s"TRIP DAO CLEAN".emojize
+  lazy val tripDaoCleanText = s"TRIP DAO CLEAN".botmessage
 
-  lazy val tripDaoCleanErrorText = s"TRIP DAO CLEAN ERROR".emojize
+  lazy val tripDaoCleanErrorText = s"TRIP DAO CLEAN ERROR".botmessage
 
-  lazy val notAllowedText = (name: String) => s"".emojize
+  lazy val notAllowedText = (name: String) => s"User $name is not allowed byt bot master".emojize
 
-  lazy val requestingPermissionText = (name: String) => s"".emojize
+  lazy val requestingPermissionText = (name: String) => s"Hola $name, esperando a que admin te autorice.".emojize
 
-  lazy val startText = (name: String) => s"".emojize
+  lazy val startText = (name: String) => s"TEXTO START".emojize
 
-  lazy val helpText = (name: String) => s"".emojize
+  lazy val helpText = (name: String) => s"TEXTO AYUDA".emojize
 
 
 }

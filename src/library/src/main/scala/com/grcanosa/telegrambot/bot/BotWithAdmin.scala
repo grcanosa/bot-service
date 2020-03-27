@@ -1,7 +1,7 @@
 package com.grcanosa.telegrambot.bot
 
 
-import akka.actor.{Actor, Props}
+import akka.actor.{Actor, ActorRef, Props}
 import com.bot4s.telegram.api.declarative.{Commands, Messages}
 import com.bot4s.telegram.api.{AkkaDefaults, Polling, TelegramBot}
 import com.bot4s.telegram.clients.AkkaHttpClient
@@ -36,7 +36,7 @@ with Commands
 
   override val client = new AkkaHttpClient(token)
 
-  val botActor = system.actorOf(Props(new BotActor), name = "botActor")
+  val botActor: ActorRef = system.actorOf(Props(new BotActor), name = "botActor")
 
   override def userNotAllowed(userH: UserHandler): Unit = {
     botActor ! SendMessage(userH.user.id,userNotAllowedResponse(userH.user.name))
