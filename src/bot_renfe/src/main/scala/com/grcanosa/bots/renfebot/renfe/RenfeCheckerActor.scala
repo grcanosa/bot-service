@@ -19,8 +19,8 @@ class RenfeCheckerActor(val driverUrl: String) extends Actor {
 
   override def receive = {
     case CheckJourney(journey,users) => {
-      val res: Seq[Trip] = renfeChecker.checkJourney(journey)
-      val journeyCheck = JourneyCheck(journey,res)
+      val res = renfeChecker.checkJourney(journey)
+      val journeyCheck = JourneyCheck(journey,res.trips)
       users.foreach{ botUser =>
         botUser ! journeyCheck
       }

@@ -3,7 +3,7 @@ package com.grcanosa.telegrambot.utils
 import java.time.LocalDate
 import com.bot4s.telegram.models.{InlineKeyboardButton, InlineKeyboardMarkup}
 
-trait CalendarKeyboard {
+trait CalendarKeyboard extends LazyBotLogging{
 
   lazy val KEYBOARD_TAG = "CALENDAR_KEYBOARD"
 
@@ -17,8 +17,14 @@ trait CalendarKeyboard {
 
   def separateCallbackData(data: String) = {
     data.split(";").toList match {
-      case action :: year :: month :: day :: Nil => (action,year,month,day)
-      case _ => (IGNORE_ACTION,"Y","M","D")
+      case _ :: action :: year :: month :: day :: Nil => {
+        botlog.info(s"Callback separated: $action $year $month $day")
+        (action,year,month,day)
+      }
+      case _ => {
+        botlog.info(s"Bad callback data")
+        (IGNORE_ACTION,"Y","M","D")
+      }
     }
   }
 

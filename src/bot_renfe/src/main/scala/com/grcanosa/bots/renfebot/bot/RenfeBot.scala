@@ -7,38 +7,43 @@ import akka.actor.{ActorRef, Props}
 import com.bot4s.telegram.api.AkkaDefaults
 import com.bot4s.telegram.api.declarative.Callbacks
 import com.bot4s.telegram.methods.SendMessage
-import com.grcanosa.bots.renfebot.bot.RenfeBot.{AddTripToDao, CleanDao, RemoveTripFromDao}
+import com.grcanosa.bots.renfebot.bot.RenfeBot.{AddTripToDao, CheckTripForUsers, CleanDao, RemoveTripFromDao}
 import com.grcanosa.bots.renfebot.dao.TripsDao
 import com.grcanosa.bots.renfebot.model.Journey
+import com.grcanosa.bots.renfebot.renfe.RenfeCheckerActor
+import com.grcanosa.bots.renfebot.renfe.RenfeCheckerActor.CheckJourney
 import com.grcanosa.bots.renfebot.user.RenfeBotUserActor
 import com.grcanosa.telegrambot.bot.BotWithAdmin
 import com.grcanosa.telegrambot.dao.mongo.{BotUserMongoDao, InteractionMongoDao}
 import com.grcanosa.telegrambot.dao.{BotDao, BotUserDao, InteractionDao}
 import com.grcanosa.telegrambot.model.BotUser
 import com.grcanosa.telegrambot.utils.{CalendarKeyboard, LazyBotLogging}
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{Config, ConfigFactory}
 
+import scala.concurrent.ExecutionContextExecutor
 import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 
  object RenfeBot extends AkkaDefaults{
 
-   lazy val config = ConfigFactory.load("renfebot.conf")
+   lazy val config: Config = ConfigFactory.load("renfebot.conf")
 
-   lazy val token = config.getString("bot.token")
-   lazy val adminId = config.getLong("bot.adminId")
+   lazy val token: String = config.getString("bot.token")
+   lazy val adminId: Long = config.getLong("bot.adminId")
 
-   lazy val mongoHost = config.getString("mongo.host")
-   lazy val mongoPort = config.getInt("mongo.port")
-   lazy val mongoDatabaseName = config.getString("bot.mongo.databasename")
+   lazy val mongoHost: String = config.getString("mongo.host")
+   lazy val mongoPort: Int = config.getInt("mongo.port")
+   lazy val mongoDatabaseName: String = config.getString("bot.mongo.databasename")
 
-   implicit val ec = system.dispatcher
+   lazy val driverUrl: String = config.getString("bot.renfe.seleniumDriverUrl")
 
-   val mongoUserDao = new BotUserMongoDao(mongoHost,mongoPort,mongoDatabaseName)
+   implicit val ec: ExecutionContextExecutor = system.dispatcher
 
-   val mongoInteractionDao = new InteractionMongoDao(mongoHost, mongoPort, mongoDatabaseName)
+   val mongoUserDao: BotUserMongoDao = new BotUserMongoDao(mongoHost,mongoPort,mongoDatabaseName)
 
-   implicit val tripDao = new TripsDao(mongoHost,mongoPort,mongoDatabaseName)
+   val mongoInteractionDao: InteractionMongoDao = new InteractionMongoDao(mongoHost, mongoPort, mongoDatabaseName)
+
+   implicit val tripDao: TripsDao = new TripsDao(mongoHost,mongoPort,mongoDatabaseName)
 
    implicit object RenfeDao extends BotDao{
      override def botUserDao: BotUserDao = mongoUserDao
@@ -47,17 +52,19 @@ import scala.util.{Failure, Success}
    }
 
 
-   val bot = new RenfeBot(token,adminId)
+   val bot = new RenfeBot(token,adminId,driverUrl)
 
    case class AddTripToDao(user: BotUser, trip: Journey)
    case class RemoveTripFromDao(user: BotUser, trip: Journey)
    case object CleanDao
+   case class CheckTripForUsers(journey: Journey, users: Seq[Long])
 
  }
 
 
  class RenfeBot(override val token: String
                    , override val adminId: Long
+               , val driverUrl: String
                    )
                   (implicit botDao: BotDao, tripsDao: TripsDao)
    extends BotWithAdmin(token,adminId)
@@ -69,6 +76,8 @@ import scala.util.{Failure, Success}
    import RenfeBotUserActor._
 
    botlog.info("Created Bot")
+
+   val renfeCheckerActor: ActorRef = system.actorOf(Props(new RenfeCheckerActor(driverUrl)),s"actor_renfechecker")
 
    onCommand("/menu"){ implicit msg =>
      allowedUser(Some("menu")){ uH =>
@@ -128,6 +137,13 @@ import scala.util.{Failure, Success}
        tripsDao.markOldTripsAsInactive(lastDate).onComplete{
          case Success(_) => botActor ! SendMessage(adminId,tripDaoCleanText,replyMarkup = Some(removeKeyboard))
          case Failure(_) => botActor ! SendMessage(adminId,tripDaoCleanErrorText,replyMarkup = Some(removeKeyboard))
+       }
+     }
+     case check: CheckTripForUsers => {
+       check.users.foreach{ id =>
+         getUser(id).foreach{ uH =>
+           renfeCheckerActor ! CheckJourney(check.journey,Seq(uH.handler))
+         }
        }
      }
      case _ =>

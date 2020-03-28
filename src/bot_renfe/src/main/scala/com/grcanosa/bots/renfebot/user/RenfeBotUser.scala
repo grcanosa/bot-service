@@ -3,10 +3,13 @@ package com.grcanosa.bots.renfebot.user
 import java.time.format.DateTimeFormatter
 
 import com.bot4s.telegram.methods.{EditMessageReplyMarkup, SendMessage}
-import com.bot4s.telegram.models.{Message, ReplyMarkup}
-import com.grcanosa.bots.renfebot.user.RenfeBotUser.{RenfeBotUserState, START_STATE, UserState}
+import com.bot4s.telegram.models.Message
+import com.grcanosa.bots.renfebot.bot.RenfeBot.CheckTripForUsers
+import com.grcanosa.bots.renfebot.model.Journey
+import com.grcanosa.bots.renfebot.user.RenfeBotUser.RenfeBotUserState
 import com.grcanosa.telegrambot.model.BotUser
 import com.grcanosa.telegrambot.utils.LazyBotLogging
+
 
 object RenfeBotUser {
 
@@ -126,14 +129,31 @@ class RenfeBotUser(val botUser: BotUser
   }
 
   private def processDate(date: String): RenfeBotEventResponse = {
-    RenfeBotEventResponse(
-    new RenfeBotUser(botUser,
-      START_USER_STATE)
-      ,
-      Seq(
-        SendMessage(botUser.id,selectedTripFullText(state.origin.get,state.dest.get,date),replyMarkup = Some(removeKeyboard))
-      )
-    )
+    (state.origin,state.dest) match {
+      case (Some(ori),Some(des)) => {
+        val journey = Journey(ori,des,date,None)
+        RenfeBotEventResponse(
+          new RenfeBotUser(botUser,
+            START_USER_STATE)
+          ,
+          Seq(
+            SendMessage(botUser.id,selectedTripFullText(state.origin.get,state.dest.get,date),replyMarkup = Some(removeKeyboard))
+            , CheckTripForUsers(journey,Seq(botUser.id))
+          )
+        )
+      }
+      case _ => {
+        RenfeBotEventResponse(this,
+          Seq(
+
+          )
+        )
+      }
+    }
+
+
+
+
   }
 
 
