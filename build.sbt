@@ -76,12 +76,25 @@ lazy val bot_renfe = project
   .disablePlugins(AssemblyPlugin)
   .settings(
     name := "bot_renfe",
-    libraryDependencies ++= testDeps
+    libraryDependencies ++= testDeps,
+    libraryDependencies += "commons-io" % "commons-io" % "2.5"
   )
   .dependsOn(
     library
   )
 
+lazy val bot_webchecker = project
+  .in(file("src/bot_webchecker"))
+  .enablePlugins(PackagingTypePlugin)
+  .disablePlugins(AssemblyPlugin)
+  .settings(
+    name := "bot_webchecker",
+    libraryDependencies ++= testDeps,
+    libraryDependencies += "commons-io" % "commons-io" % "2.5"
+  )
+  .dependsOn(
+    library
+  )
 lazy val bot_apps = project
   .in(file("src/bot_apps"))
   .enablePlugins(PackagingTypePlugin)
@@ -100,6 +113,7 @@ lazy val bot_apps = project
     , bot_grupo
     , bot_renfe
     , bot_codigosecreto
+    , bot_webchecker
   )
 
 val telegramBotVersion = "4.0.0-RC2"
