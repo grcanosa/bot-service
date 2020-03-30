@@ -7,17 +7,13 @@ import akka.actor.{ActorRef, Props}
 import com.bot4s.telegram.api.AkkaDefaults
 import com.bot4s.telegram.api.declarative.Callbacks
 import com.bot4s.telegram.methods.SendMessage
-import com.grcanosa.bots.renfebot.bot.RenfeBot.{AddTripToDao, CheckTripForUsers, CleanDao, RemoveTripFromDao}
-import com.grcanosa.bots.renfebot.dao.TripsDao
-import com.grcanosa.bots.renfebot.model.Journey
-import com.grcanosa.bots.renfebot.renfe.RenfeCheckerActor
-import com.grcanosa.bots.renfebot.renfe.RenfeCheckerActor.CheckJourney
-import com.grcanosa.bots.renfebot.user.RenfeBotUserActor
+import com.grcanosa.bots.webchecker.checks.CheckCorteInglesDeliveries
+import com.grcanosa.bots.webchecker.user.WebCheckerUserActor
 import com.grcanosa.telegrambot.bot.BotWithAdmin
 import com.grcanosa.telegrambot.dao.mongo.{BotUserMongoDao, InteractionMongoDao}
 import com.grcanosa.telegrambot.dao.{BotDao, BotUserDao, InteractionDao}
 import com.grcanosa.telegrambot.model.BotUser
-import com.grcanosa.telegrambot.utils.{CalendarKeyboard, LazyBotLogging}
+import com.grcanosa.telegrambot.utils.{CalendarKeyboard, LazyBotLogging, StringUtils}
 import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.concurrent.ExecutionContextExecutor
@@ -63,9 +59,28 @@ class WebCheckerBot(override val token: String
   extends BotWithAdmin(token,adminId)
     with Callbacks
   with LazyBotLogging
+  with CheckCorteInglesDeliveries
+  with StringUtils
+  with WebCheckerDefaultResponses
 {
 
+  override val chromeDriverUrl = driverUrl
 
+  onCommand("/checknow"){implicit msg =>
+    allowedUser(Some("checknow")) { uH =>
+      isAdmin{ _ =>
+        checkElCorteInglesSupermercadoNow()
+      }()
+    }
+  }
+
+  onMessage{ implicit msg =>
+    isNotCommand { _ =>
+      allowedUser(Some("message")) { uH =>
+        botActor ! SendMessage(uH.user.id, "Todavía no soy muy listo, no te he entendido. Por ahora sólo puedo avisarte cuando haya huecos de envio en el super de ElCorteIngles".botmessage)
+      }
+    }
+  }
 
   override def createNewUserActor(botUser: BotUser): ActorRef = {
     botlog.info(s"Creating actor for user: $botUser with botActor $botActor")

@@ -1,4 +1,4 @@
-package com.grcanosa.bots.webchecker.bot
+package com.grcanosa.bots.webchecker.user
 
 import akka.actor.{Actor, ActorRef}
 import com.grcanosa.telegrambot.model.BotUser

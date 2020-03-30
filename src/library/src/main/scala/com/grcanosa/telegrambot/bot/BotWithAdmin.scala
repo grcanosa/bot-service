@@ -60,6 +60,19 @@ with Commands
     }
   }
 
+  onCommand("/broadcast"){ implicit msg =>
+    isAdmin{ _ =>
+      val txtMsg = msg.text.map(_.replace("/broadcast",""))
+      txtMsg.foreach{ msgToSend =>
+        permittedUserHandlers.foreach{ uH =>
+          if(uH.user.id != adminId){
+            botActor ! SendMessage(uH.user.id,msgToSend)
+          }
+        }
+      }
+    }()
+  }
+
   onCommand("/users") { implicit msg =>
     isAdmin{ _ =>
       val msg = userHandlers.values.toSeq.map{ uh =>
@@ -74,7 +87,7 @@ with Commands
     allowedUser(Some("help")) { uH =>
       isAdmin { _ =>
         val normalmsg = helpCmdResponse(uH.user.name)
-        val realmsg = normalmsg + "\n" + "/users\n/permission"
+        val realmsg = normalmsg + "\n" + "/users\n/permission\nbroadcast"
         reply(realmsg)
       }{ _ =>
         reply(helpCmdResponse(uH.user.name))
