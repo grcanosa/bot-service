@@ -45,6 +45,8 @@ object RenfeBotData extends CalendarKeyboard{
 
   lazy val hacerConsultaAhoraText = "Ok, voy a hacer una consulta puntual.".emojize
 
+  lazy val addConsultaPeriodicaText = "Ok, voy a añadir una consulta periódica.".emojize
+
   lazy val selectOriginText = "Introduce estación origen :train2:".emojize
   lazy val selectDestText = "Introduce estación destino :train2:".emojize
   lazy val selectDateText = "Elige ahora la fecha del viaje :calendar:".emojize
@@ -52,6 +54,10 @@ object RenfeBotData extends CalendarKeyboard{
   lazy val selectedTripOriginDepartureText = (ori: String, dest: String) => s"Has seleccionado el trayecto $ori -> $dest.".emojize
 
   lazy val selectedTripFullText = (ori: String, dest: String, date: String) => s"Has seleccionado el trayecto $ori -> $dest para el dia $date".emojize
+
+  lazy val performinCheckNowText = s"HACIENDO CONSULTA AHORA".emojize
+
+  lazy val addingTripToDaoText = s"Añadiendo consulta periódica.".emojize
 
   lazy val tripAddedText = s"TRIP ADDED".emojize
 

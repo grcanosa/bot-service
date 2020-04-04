@@ -96,7 +96,7 @@ trait CheckCorteInglesDeliveries {
     }
   }
 
-  system.scheduler.schedule(30 seconds, 15 minutes){
+  system.scheduler.schedule(30 seconds, 3 minutes){
     checkElCorteInglesSupermercadoNow()
   }
 

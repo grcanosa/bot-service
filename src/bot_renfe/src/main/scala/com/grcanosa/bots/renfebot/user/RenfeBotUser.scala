@@ -4,7 +4,7 @@ import java.time.format.DateTimeFormatter
 
 import com.bot4s.telegram.methods.{EditMessageReplyMarkup, SendMessage}
 import com.bot4s.telegram.models.Message
-import com.grcanosa.bots.renfebot.bot.RenfeBot.CheckTripForUsers
+import com.grcanosa.bots.renfebot.bot.RenfeBot.{AddTripToDao, CheckTripForUsers}
 import com.grcanosa.bots.renfebot.model.Journey
 import com.grcanosa.bots.renfebot.user.RenfeBotUser.RenfeBotUserState
 import com.grcanosa.telegrambot.model.BotUser
@@ -46,7 +46,9 @@ object RenfeBotUser {
 
 class RenfeBotUser(val botUser: BotUser
                    , val state: RenfeBotUserState
-                   ) extends LazyBotLogging {
+                   )
+  extends LazyBotLogging
+{
 
   import RenfeBotUser._
   import com.grcanosa.bots.renfebot.bot.RenfeBotData._
@@ -128,55 +130,55 @@ class RenfeBotUser(val botUser: BotUser
     }
   }
 
-  private def processDate(date: String): RenfeBotEventResponse = {
-    (state.origin,state.dest) match {
-      case (Some(ori),Some(des)) => {
-        val journey = Journey(ori,des,date,None)
-        RenfeBotEventResponse(
-          new RenfeBotUser(botUser,
-            START_USER_STATE)
-          ,
-          Seq(
-            SendMessage(botUser.id,selectedTripFullText(state.origin.get,state.dest.get,date),replyMarkup = Some(removeKeyboard))
-            , CheckTripForUsers(journey,Seq(botUser.id))
-          )
-        )
+  private def processSelectedJourney(origin: String, dest: String, date: String): RenfeBotEventResponse = {
+    val journey = Journey(origin,dest,date,None)
+    state.action match {
+      case CONSULTA_AHORA =>{ RenfeBotEventResponse(new RenfeBotUser(botUser, START_USER_STATE),
+        Seq(SendMessage(botUser.id,selectedTripFullText(state.origin.get,state.dest.get,date),replyMarkup = Some(removeKeyboard))
+          , SendMessage(botUser.id,performinCheckNowText,replyMarkup = Some(removeKeyboard))
+          , CheckTripForUsers(journey,Seq(botUser.id))
+      ) )
       }
-      case _ => {
-        RenfeBotEventResponse(this,
-          Seq(
-
+      case CONSULTA_PERIODICA => { RenfeBotEventResponse(new RenfeBotUser(botUser, START_USER_STATE),
+        Seq(SendMessage(botUser.id,selectedTripFullText(state.origin.get,state.dest.get,date),replyMarkup = Some(removeKeyboard))
+          , SendMessage(botUser.id,addingTripToDaoText,replyMarkup = Some(removeKeyboard))
+          , AddTripToDao(botUser, journey)
           )
-        )
+      )
       }
     }
+  }
 
-
-
-
+  private def processDate(date: String): RenfeBotEventResponse = {
+    (state.origin,state.dest) match {
+      case (Some(ori),Some(des)) => processSelectedJourney(ori,des,date)
+      case _ =>  RenfeBotEventResponse(this,Seq.empty)
+    }
   }
 
 
   private def processMessageStartState(msg: Message): RenfeBotEventResponse = {
     msg.text match {
-      case Some(ConsultaAhoraMenuText) => {
-        RenfeBotEventResponse(
-        new RenfeBotUser(botUser
-          , state.copy(state = SELECT_ORIGIN_STATE, action = CONSULTA_AHORA)
-        )
+      case Some(ConsultaAhoraMenuText) => { RenfeBotEventResponse(
+        new RenfeBotUser(botUser, state.copy(state = SELECT_ORIGIN_STATE, action = CONSULTA_AHORA) )
           , Seq(
             SendMessage(botUser.id,hacerConsultaAhoraText,replyMarkup = Some(removeKeyboard))
             , SendMessage(botUser.id,selectOriginText,replyMarkup = Some(stationsKeyboard))
           )
         )
       }
-      case Some(ConsultaPeriodicaMenuText) => {
-        ???
+      case Some(ConsultaPeriodicaMenuText) => { RenfeBotEventResponse(
+        new RenfeBotUser(botUser, state.copy(state = SELECT_ORIGIN_STATE, action = CONSULTA_PERIODICA) )
+        , Seq(
+          SendMessage(botUser.id,addConsultaPeriodicaText,replyMarkup = Some(removeKeyboard))
+          , SendMessage(botUser.id,selectOriginText,replyMarkup = Some(stationsKeyboard))
+        )
+      )
       }
       case Some(EliminarConsultaPeriodicaMenuText) => {
         ???
       }
-      case Some(VerConsultaPeriodicaMenuText) => {
+      case Some(VerConsultaPeriodicaMenuText) => { RenfeBotEventResponse(
         ???
       }
       case Some(_) => {
