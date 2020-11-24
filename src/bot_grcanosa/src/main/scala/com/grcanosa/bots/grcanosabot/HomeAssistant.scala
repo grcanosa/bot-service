@@ -27,7 +27,7 @@ trait HomeAssistant extends LazyBotLogging{ this: BotWithAdmin =>
 
   val termoStateRequestGet =  HttpRequest(
     HttpMethods.GET,
-    uri="http://192.168.1.100:8123/api/states/input_number.termo_time",
+    uri="http://192.168.10.200:8123/api/states/input_number.termo_time",
     List(
       akka.http.scaladsl.model.headers.Authorization(OAuth2BearerToken(homeAssistantToken))
     )
@@ -50,7 +50,7 @@ trait HomeAssistant extends LazyBotLogging{ this: BotWithAdmin =>
 
   def updateValueReq(state: String) = HttpRequest(
     HttpMethods.POST,
-    uri="http://192.168.1.100:8123/api/services/input_number/set_value",
+    uri="http://192.168.10.200:8123/api/services/input_number/set_value",
     List(
       akka.http.scaladsl.model.headers.Authorization(OAuth2BearerToken(homeAssistantToken))
     )

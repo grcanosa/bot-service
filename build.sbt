@@ -136,7 +136,7 @@ val seleniumVersion = "3.141.59"
 val akkaVersion = "2.6.8"
 
 val libDeps = Seq(
-    "com.vdurmont" % "emoji-java" % "4.0.0"
+    "com.vdurmont" % "emoji-java" % "5.1.1"
     ,"com.bot4s" %% "telegram-core" % telegramBotVersion
     ,"com.bot4s" %% "telegram-akka" % telegramBotVersion
     ,"org.mongodb.scala" %% "mongo-scala-driver" % "2.6.0"

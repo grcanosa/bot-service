@@ -68,7 +68,7 @@ extends BotWithAdmin(token, adminId)
 
   onCommand("/cuando"){ implicit msg =>
     allowedUser(Some("cuando")){ uH =>
-      reply("La boda será el día 24 de Julio de 2021 a las 12h.")
+      reply(cuandoResponse)
     }
   }
 

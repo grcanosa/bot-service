@@ -6,6 +6,7 @@ import akka.Done
 import akka.actor.Actor.Receive
 import akka.actor.ActorRef
 import akka.stream.scaladsl.Source
+import com.bot4s.telegram.methods.SendMessage
 import com.danielasfregola.twitter4s.TwitterRestClient
 import com.grcanosa.bots.bodabot.TwitterMessages.DailyTweet
 import com.grcanosa.telegrambot.bot.BotWithAdmin
@@ -43,7 +44,10 @@ trait TwitterMessages{ this: BotWithAdmin =>
     case DailyTweet => {
       botlog.info(s"Creating daily tweet")
       createDailyTweet().onComplete{
-        case Success(tweet) => botlog.info(s"Created $tweet")
+        case Success(tweet) => {
+          botlog.info(s"Created $tweet")
+          botActor ! SendMessage(adminId,"Tweet creado correctamente")
+        }
         case Failure(e) => botlog.error(s"Error in tweet",e)
       }
     }

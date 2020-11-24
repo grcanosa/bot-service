@@ -14,7 +14,10 @@ trait BodaBotResponses { this: BotWithAdmin =>
   }
 
   override def startCmdResponse(name: String): String = {
-    s"¡Bienvenido al bot de la Boda de Mer e Isa! Escribe /help para ver qué puedo hacer."
+    s"¡Bienvenido al bot de la Boda de Mer e Isa :two_women_holding_hands:! Escribe /help para ver qué puedo hacer.".emojize
   }
+
+
+  val cuandoResponse = "La boda será el día 24 de Julio de 2021 a las 12h. :wedding: :kiss_woman_woman: :woman-kiss-woman: :couplekiss_woman_woman:".emojize
 
 }
