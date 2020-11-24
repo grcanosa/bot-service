@@ -18,8 +18,8 @@ trait BodaBotResponses { this: BotWithAdmin =>
   }
 
 
-  val cuandoResponse = "La boda será el día 24 de Julio de 2021 a las 12h. :wedding: :couplekiss_woman_woman:".emojize
+  val cuandoResponse: String = "La boda será el día 24 de Julio de 2021 a las 12h. :wedding: :couplekiss_woman_woman:".emojize
 
-  val dondeResponse = " En Gijón. :sunrise_over_mountains:"
+  val dondeResponse:String = " En Gijón. :sunrise_over_mountains:".emojize
 
 }
