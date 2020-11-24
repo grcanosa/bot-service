@@ -83,17 +83,6 @@ extends BotWithAdmin(token, adminId)
   import BodaBotUserActor._
 
 
-  onCommand("/cuando"){ implicit msg =>
-    allowedUser(Some("cuando")){ uH =>
-      uH.handler ! CuandoMsg(msg)
-    }
-  }
-
-  onCommand("/donde"){ implicit msg =>
-    allowedUser(Some("donde")){ uH =>
-      uH.handler ! DondeMsg(msg)
-    }
-  }
 
   onRegex("(?i).*hola.*|.*ey.*|.*buenas.*|".r){ implicit msg =>
     groups => {
