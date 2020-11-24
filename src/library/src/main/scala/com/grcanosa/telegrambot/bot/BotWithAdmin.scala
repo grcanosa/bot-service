@@ -65,9 +65,9 @@ with Commands
       val txtMsg = msg.text.map(_.replace("/broadcast",""))
       txtMsg.foreach{ msgToSend =>
         permittedUserHandlers.foreach{ uH =>
-          if(uH.user.id != adminId){
+          //if(uH.user.id != adminId){
             botActor ! SendMessage(uH.user.id,msgToSend)
-          }
+          //}
         }
       }
     }()
@@ -87,7 +87,7 @@ with Commands
     allowedUser(Some("help")) { uH =>
       isAdmin { _ =>
         val normalmsg = helpCmdResponse(uH.user.name)
-        val realmsg = normalmsg + "\n" + "/users\n/permission\nbroadcast"
+        val realmsg = normalmsg + "\n" + "/users\n/permission\n/broadcast"
         reply(realmsg)
       }{ _ =>
         reply(helpCmdResponse(uH.user.name))

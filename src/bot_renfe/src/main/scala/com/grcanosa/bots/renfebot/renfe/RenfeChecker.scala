@@ -10,6 +10,7 @@ import java.time.{LocalDate, LocalDateTime, LocalTime, ZoneOffset}
 import scala.concurrent.duration._
 import com.grcanosa.bots.renfebot.model.{Journey, Trip}
 import com.grcanosa.bots.renfebot.renfe.RenfeChecker.CheckJourneyResponse
+import com.typesafe.scalalogging.LazyLogging
 import org.openqa.selenium.{By, Keys, WebElement}
 import org.openqa.selenium.remote.{BrowserType, DesiredCapabilities, RemoteWebDriver}
 import org.openqa.selenium.support.ui.WebDriverWait
@@ -25,7 +26,7 @@ object RenfeChecker{
 
 }
 
-class RenfeChecker(val driverUrl: String)(implicit ec: ExecutionContext) {
+class RenfeChecker(val driverUrl: String)(implicit ec: ExecutionContext) extends LazyLogging{
   val hourFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("HH.mm")
   val dateFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
   val chrome = new DesiredCapabilities()
@@ -37,6 +38,7 @@ class RenfeChecker(val driverUrl: String)(implicit ec: ExecutionContext) {
 
   def checkJourney(trip: Journey): CheckJourneyResponse = {
       Try {
+        logger.info(s"Checking trip ${trip.origin} -> ${trip.destination} on ${trip.departureDate}")
         implicit val driver: RemoteWebDriver = new RemoteWebDriver(new URL(driverUrl), chrome)
         val origin = trip.origin
         val destination = trip.destination
@@ -52,7 +54,10 @@ class RenfeChecker(val driverUrl: String)(implicit ec: ExecutionContext) {
         }
         CheckJourneyResponse(trips,"")
       }.recover{
-        case exp => CheckJourneyResponse(Seq.empty[Trip],"")
+        case exp => {
+          logger.error(s"Problemn checking journey $exp")
+          CheckJourneyResponse(Seq.empty[Trip],"")
+        }
       }.get
   }
 
@@ -114,13 +119,14 @@ class RenfeChecker(val driverUrl: String)(implicit ec: ExecutionContext) {
         case true => Some(el.findElement(By.xpath(".//td[@headers='colPrecio']")).getText)
         case false => None
         }
+      logger.info(s"Trip $salida $llegada $precio")
       Trip(
         dateTimeSalida.toEpochSecond(ZoneOffset.UTC)
         , duration
         , salida
         , llegada
         , disp
-        , precio.map(_.split(' ').head.toFloat)
+        , precio.map(_.split(' ').head.replace(',','.').toFloat)
         , tipo
         , clase
         , tarifa

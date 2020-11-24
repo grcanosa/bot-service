@@ -140,11 +140,10 @@ import scala.util.{Failure, Success}
        }
      }
      case check: CheckTripForUsers => {
-       check.users.foreach{ id =>
-         getUser(id).foreach{ uH =>
-           renfeCheckerActor ! CheckJourney(check.journey,Seq(uH.handler))
-         }
+       val userHandlers = check.users.flatMap{ id =>
+         getUser(id).map(_.handler)
        }
+       renfeCheckerActor ! CheckJourney(check.journey,userHandlers)
      }
      case _ =>
    }

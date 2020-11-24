@@ -1,14 +1,14 @@
 version: '3'
 services:
-#  grupo_bot:
-#    image: botservice
-#    container_name: grupobot
-#    volumes:
-#      - "/etc/timezone:/etc/timezone:ro"
-#    restart: unless-stopped
-#    command: ["java","-cp","/app/bot.jar","com.grcanosa.bots.app.GrupoBotApp"]
-#    environment:
-#      - MONGOHOST=mongodb
+  grupo_bot:
+    image: botservice
+    container_name: grupobot
+    volumes:
+      - "/etc/timezone:/etc/timezone:ro"
+    restart: unless-stopped
+    command: ["java","-cp","/app/bot.jar","com.grcanosa.bots.app.GrupoBotApp"]
+    environment:
+      - MONGOHOST=mongodb
   grcanosa_bot:
     image: botservice
     container_name: grcanosabot
@@ -16,6 +16,15 @@ services:
     volumes:
       - "/etc/timezone:/etc/timezone:ro"
     command: ["java","-cp","/app/bot.jar","com.grcanosa.bots.app.GrcanosaBotApp"]
+    environment:
+      - MONGOHOST=mongodb
+  boda_bot:
+    image: botservice
+    container_name: bodabot
+    restart: unless-stopped
+    volumes:
+      - "/etc/timezone:/etc/timezone:ro"
+    command: [ "java","-cp","/app/bot.jar","com.grcanosa.bots.app.BodaBotApp" ]
     environment:
       - MONGOHOST=mongodb
 networks:

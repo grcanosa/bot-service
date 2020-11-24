@@ -1,7 +1,7 @@
 package com.grcanosa.telegrambot.model
 
 import com.bot4s.telegram.models.User
-import com.grcanosa.telegrambot.model.BotUser.BotUserPermission
+import com.grcanosa.telegrambot.model.BotUser.{BotUserPermission, PERMISSION_NOT_SET}
 
 case class BotUser(id: Long
                    ,permission: BotUserPermission
@@ -27,7 +27,7 @@ object BotUser{
     }
   }
 
-  def fromUser(user:User) = {
-      BotUser(user.id,PERMISSION_NOT_SET,user.firstName,user.username,user.lastName)
+  def fromUser(user:User, defaultPermission: BotUserPermission = PERMISSION_NOT_SET) = {
+      BotUser(user.id,defaultPermission,user.firstName,user.username,user.lastName)
   }
 }

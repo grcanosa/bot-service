@@ -4,7 +4,7 @@ import akka.actor.ActorRef
 import com.bot4s.telegram.models.User
 import com.grcanosa.telegrambot.dao.BotDao
 import com.grcanosa.telegrambot.model.BotUser
-import com.grcanosa.telegrambot.model.BotUser.PERMISSION_ALLOWED
+import com.grcanosa.telegrambot.model.BotUser.{BotUserPermission, PERMISSION_ALLOWED, PERMISSION_NOT_SET}
 import com.grcanosa.telegrambot.utils.LazyBotLogging
 
 import scala.concurrent.duration._
@@ -19,7 +19,7 @@ trait UserRegistry extends BotDao with LazyBotLogging{
 
   def createNewUserActor(botUser: BotUser): ActorRef
 
-
+  val defaultUserPermission: BotUserPermission = PERMISSION_NOT_SET
 
   val userHandlers = collection.mutable.Map[Long, UserHandler]()
 
@@ -49,7 +49,7 @@ trait UserRegistry extends BotDao with LazyBotLogging{
 
   def getUser(user: User) = {
     userHandlers.getOrElseUpdate(user.id,{
-      val bu = BotUser.fromUser(user)
+      val bu = BotUser.fromUser(user,defaultUserPermission)
       botlog.info(s"Inserting user into database: ${bu.name}")
       val fut = botUserDao.insertUser(bu).map{
         case true => {

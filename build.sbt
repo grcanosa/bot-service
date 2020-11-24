@@ -43,6 +43,19 @@ lazy val bot_grcanosa = project
     library
   )
 
+lazy val bot_boda = project
+  .in(file("src/bot_boda"))
+  .enablePlugins(PackagingTypePlugin)
+  .disablePlugins(AssemblyPlugin)
+  .settings(
+    name := "bot_boda"
+    ,libraryDependencies ++= testDeps
+    , libraryDependencies += "com.danielasfregola" %% "twitter4s" % "7.0"
+  )
+  .dependsOn(
+    library
+  )
+
 
 
 lazy val bot_grupo = project
@@ -114,26 +127,28 @@ lazy val bot_apps = project
     , bot_renfe
     , bot_codigosecreto
     , bot_webchecker
+    , bot_boda
   )
 
 val telegramBotVersion = "4.0.0-RC2"
 val seleniumVersion = "3.141.59"
-val akkaVersion = "2.5.30"
+//val akkaVersion = "2.5.30"
+val akkaVersion = "2.6.8"
 
 val libDeps = Seq(
-    "com.vdurmont" % "emoji-java" % "4.0.0",
-    "com.bot4s" %% "telegram-core" % telegramBotVersion,
-    "com.bot4s" %% "telegram-akka" % telegramBotVersion,
-    "org.mongodb.scala" %% "mongo-scala-driver" % "2.6.0",
-    "org.seleniumhq.selenium" % "selenium-support" % seleniumVersion,
-    "org.seleniumhq.selenium" % "selenium-remote-driver" % seleniumVersion,
-    "com.github.etaty" %% "rediscala" % "1.9.0",
-    "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
-    "io.spray" %% "spray-json" % "1.3.5",
-    "ch.qos.logback" % "logback-classic" % "1.1.7",
-    "com.typesafe.akka" %% "akka-actor" % akkaVersion,
-  "com.typesafe.akka" %% "akka-stream" % akkaVersion,
-  "com.typesafe.akka" %% "akka-protobuf" % akkaVersion
+    "com.vdurmont" % "emoji-java" % "4.0.0"
+    ,"com.bot4s" %% "telegram-core" % telegramBotVersion
+    ,"com.bot4s" %% "telegram-akka" % telegramBotVersion
+    ,"org.mongodb.scala" %% "mongo-scala-driver" % "2.6.0"
+    ,"org.seleniumhq.selenium" % "selenium-support" % seleniumVersion
+    ,"org.seleniumhq.selenium" % "selenium-remote-driver" % seleniumVersion
+    ,"com.github.etaty" %% "rediscala" % "1.9.0"
+    ,"com.typesafe.scala-logging" %% "scala-logging" % "3.9.2"
+    ,"io.spray" %% "spray-json" % "1.3.5"
+    ,"ch.qos.logback" % "logback-classic" % "1.1.7"
+    ,"com.typesafe.akka" %% "akka-actor" % akkaVersion
+    ,"com.typesafe.akka" %% "akka-stream" % akkaVersion
+    ,"com.typesafe.akka" %% "akka-protobuf" % akkaVersion
 )
 
 val testDeps = Seq(

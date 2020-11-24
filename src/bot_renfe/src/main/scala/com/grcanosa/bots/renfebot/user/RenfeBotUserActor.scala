@@ -44,7 +44,10 @@ with LazyBotLogging{
     case msg: Message => {
       val resp = renfeBotUser.processMessage(msg)
       renfeBotUser = resp.renfeBotUser
-      resp.responses.foreach(botActor ! _)
+      resp.responses.foreach { msg =>
+        botActor ! msg
+        Thread.sleep(10)
+      }
     }
 
     case KeyboardCallbackData(messageId,data) => {

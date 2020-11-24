@@ -178,7 +178,7 @@ class RenfeBotUser(val botUser: BotUser
       case Some(EliminarConsultaPeriodicaMenuText) => {
         ???
       }
-      case Some(VerConsultaPeriodicaMenuText) => { RenfeBotEventResponse(
+      case Some(VerConsultaPeriodicaMenuText) => { //RenfeBotEventResponse(
         ???
       }
       case Some(_) => {
