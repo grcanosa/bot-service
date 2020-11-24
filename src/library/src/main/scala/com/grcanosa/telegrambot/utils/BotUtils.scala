@@ -10,7 +10,7 @@ import scala.util.{Random, Try}
 
 
 
-object BotUtils extends StringUtils {
+trait BotUtils extends StringUtils {
 
   //val BOTLOG  = LoggerFactory.getLogger("botloggger")
 
@@ -18,14 +18,16 @@ object BotUtils extends StringUtils {
 
   implicit class RandomFromList2[T](li: Seq[T]) {
 
-    def chooseRandom(): Option[T] = li.length match {
+    def chooseRandomOp(): Option[T] = li.length match {
       case 0 => None
       case _ => Some(li(random.nextInt(li.length)))
     }
+
+    def chooseRandom(): T = chooseRandomOp().get
+
   }
 
 
-
-
-
 }
+
+object BotUtils extends BotUtils

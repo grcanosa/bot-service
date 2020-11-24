@@ -31,5 +31,5 @@ object GrcanosaBotData {
 
   def noSeasPresumidoText(name: String) = Seq(
     s"$name, no seas tan presumido!!"
-  ).chooseRandom().get
+  ).chooseRandomOp().get
 }

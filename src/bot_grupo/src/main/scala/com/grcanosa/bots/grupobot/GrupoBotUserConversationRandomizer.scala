@@ -47,7 +47,7 @@ trait GrupoBotUserConversationRandomizer extends UserRegistry with LazyBotLoggin
     rwLock.synchronized {
       val destUH = getUsersWithNoConversations2()
         .filter(uh => uh.user.id != userH.user.id)
-        .chooseRandom()
+        .chooseRandomOp()
 
       destUH.map { duh =>
         botlog.info(s"Conversation assigned to ${duh.user.name}")

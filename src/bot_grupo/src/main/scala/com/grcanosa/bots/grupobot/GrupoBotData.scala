@@ -82,15 +82,15 @@ object GrupoBotData extends LazyBotLogging{
                   })
 
 
-  def abrazarRandom = Seq("abrazar","achuchar","estrujar").chooseRandom().get
+  def abrazarRandom = Seq("abrazar","achuchar","estrujar").chooseRandomOp().get
 
-  def abrazadoRandom = Seq("abrazado", "achuchado","estrujado").chooseRandom().get
+  def abrazadoRandom = Seq("abrazado", "achuchado","estrujado").chooseRandomOp().get
 
-  def abrazoNombreRandom = Seq("abrazo","achuchón", "estrujón").chooseRandom().get
+  def abrazoNombreRandom = Seq("abrazo","achuchón", "estrujón").chooseRandomOp().get
 
-  def abrazoRandom = Seq("abrazó", "achuchó", "estrujó").chooseRandom().get
+  def abrazoRandom = Seq("abrazó", "achuchó", "estrujó").chooseRandomOp().get
 
-  def abrazosRandom = Seq("abrazos","achuchones", "estrujones").chooseRandom().get
+  def abrazosRandom = Seq("abrazos","achuchones", "estrujones").chooseRandomOp().get
 
   val hugChainStartedText = (name: String) => s"""$name, acabas de iniciar una cadena de ${abrazosRandom}! :smile: ¡Elige a quién quieres ${abrazarRandom}!""".stripMargin.bottext
 

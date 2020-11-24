@@ -16,14 +16,14 @@ trait GrcanosaFrases {
   //piropos.foreach(p => println(s"PIROPO: $p"))
 
   def getAlgoBonito: String = {
-    piropos.chooseRandom().getOrElse("")
+    piropos.chooseRandomOp().getOrElse("")
   }
 
   def getAlgoRealmenteBonito = {
-    piroposRealmente.chooseRandom().getOrElse("")
+    piroposRealmente.chooseRandomOp().getOrElse("")
   }
 
   def getStartDayMessage = {
-    startDayMessages.chooseRandom().getOrElse("")
+    startDayMessages.chooseRandomOp().getOrElse("")
   }
 }
