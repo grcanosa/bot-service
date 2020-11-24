@@ -74,7 +74,7 @@ extends BotWithAdmin(token, adminId)
 
   onCommand("/donde"){ implicit msg =>
     allowedUser(Some("donde")){ uH =>
-      reply("Gijón.")
+      reply(dondeResponse)
     }
   }
 
