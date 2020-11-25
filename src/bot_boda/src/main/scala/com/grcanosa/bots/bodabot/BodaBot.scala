@@ -132,9 +132,15 @@ extends BotWithAdmin(token, adminId)
     }
   }
 
+  val startHelpRegex = "\\/start|\\/help".r
+
   onMessage{ implicit msg =>
     allowedUser(Some("msg")){uH =>
-      uH.handler ! UnknownMsg(msg)
+      if(msg.text.isDefined && startHelpRegex.findFirstMatchIn(msg.text.get).isDefined){
+        //Ignoring message
+      }else{
+        uH.handler ! UnknownMsg(msg)
+      }
     }
   }
 
