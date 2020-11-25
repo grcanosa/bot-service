@@ -1,6 +1,6 @@
 package com.grcanosa.bots.bodabot
 
-import java.time.LocalDateTime
+import java.time.{LocalDateTime, Month}
 
 import akka.Done
 import akka.actor.Actor.Receive
@@ -59,7 +59,12 @@ trait TwitterMessages{ this: BotWithAdmin =>
 
 
   def getDailyTweetText(): String = {
-    s"Hoy no es la boda de Mer e Isa."
+    val n = LocalDateTime.now()
+    if(n.getYear == 2021 && n.getMonth == Month.JULY && n.getDayOfMonth == 24){
+      s"¡¡¡¡¡Hoy es la boda de Mer e Isa!!!!!"
+    }else{
+      s"Hoy no es la boda de Mer e Isa."
+    }
   }
 
 }

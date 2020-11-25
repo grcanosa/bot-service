@@ -12,7 +12,7 @@ import com.grcanosa.telegrambot.bot.user.UserHandler
 import com.grcanosa.telegrambot.dao.{BotDao, BotUserDao, InteractionDao}
 import com.grcanosa.telegrambot.dao.mongo.{BotUserMongoDao, InteractionMongoDao}
 import com.grcanosa.telegrambot.model.BotUser
-import com.grcanosa.telegrambot.model.BotUser.PERMISSION_ALLOWED
+import com.grcanosa.telegrambot.model.BotUser.{PERMISSION_ALLOWED, PERMISSION_NOT_SET}
 import com.typesafe.config.Config
 
 import scala.concurrent.ExecutionContext
@@ -67,25 +67,23 @@ extends BotWithAdmin(token, adminId)
   with RegexCommands
 {
 
-  override val defaultUserPermission: BotUser.BotUserPermission = PERMISSION_ALLOWED
+  override val defaultUserPermission: BotUser.BotUserPermission = PERMISSION_NOT_SET
 
   val selfActor: ActorRef = system.actorOf(Props(new BodaBotActor()))
 
   object BodaBotUserActor{
     case object RemoveOldMessages
     case class RespondMsg(r: String=> String,msg:Message)
-    case class CuandoMsg(msg: Message)
-    case class DondeMsg(msg: Message)
-    case class CuantoMsg(msg: Message)
-    case class HolaMsg(msg: Message)
-    case class SaeiMsg(msg: Message)
-    case class QuienMsg(msg: Message)
-    case class QueVivanLasNovias(ms: Message)
     case class UnknownMsg(msg: Message)
 
     val regexInteractionsResponsesMatches: Seq[(Regex, String, String => String)] = Seq(
-      ("(?i).*hola.*|.*ey.*|.*buenas.*|".r,"hola",holaResponse)
-      ,("(?i).*sae+i+.*|.*marian.*".r,"saei",saeiResponse)
+      ("(?i)\\bhola\\b|\\bey\\b|\\bbuenas\\b".r,"hola",holaResponse)
+      ,("(?i).*sae+i+.*|\\bmarian\\b".r,"saei",saeiResponse)
+      ,("(?i).*qui[eé]n.*".r,"quien",quienResponse)
+      ,("(?i).*cu[aá]ndo.*".r,"cuando",cuandoResponse)
+      ,("(?i).*donde.*".r,"donde",dondeResponse)
+      ,("(?i)\\bMer(?:cedes)?\\b|\\bIsa(?:bel)?\\b".r,"novias",queVivanLasNoviasResponse)
+      ,("(?i).*cu[aá]nto.*".r,"cuanto",cuantoResponse)
     )
   }
   import BodaBotUserActor._
@@ -101,63 +99,6 @@ extends BotWithAdmin(token, adminId)
     }
   }
 
-//
-//  onRegex("(?i).*hola.*|.*ey.*|.*buenas.*|".r){ implicit msg =>
-//    groups => {
-//      allowedUser(Some("hola")){ uH =>
-//        uH.handler ! HolaMsg(msg)
-//      }
-//    }
-//  }
-//
-//  onRegex("(?i).*sae+i+.*|.*marian.*".r){implicit msg =>
-//    groups => {
-//      allowedUser(Some("saei")){ uH =>
-//        uH.handler ! SaeiMsg(msg)
-//      }
-//    }
-//  }
-
-  onRegex("(?i).*qui[eé]n.*".r){implicit msg =>
-    groups => {
-      allowedUser(Some("quien")){ uH =>
-        uH.handler ! QuienMsg(msg)
-      }
-    }
-  }
-
-  onRegex("(?i).*cu[aá]ndo.*".r){implicit msg =>
-    groups => {
-      allowedUser(Some("cuando")){ uH =>
-          uH.handler ! CuandoMsg(msg)
-      }
-    }
-  }
-
-  onRegex("(?i).*donde.*".r){implicit msg =>
-    groups => {
-      allowedUser(Some("donde")){ uH =>
-       uH.handler ! DondeMsg(msg)
-      }
-    }
-  }
-
-  onRegex("(?i).*cu[aá]nto.*".r){implicit msg =>
-    groups => {
-      allowedUser(Some("cuanto")){ uH =>
-        uH.handler ! CuantoMsg(msg)
-      }
-    }
-  }
-
-  onRegex("(?i)\\bMer(?:cedes)?\\b|\\bIsa(?:bel)?\\b".r){implicit msg =>
-    _ => {
-      allowedUser(Some("novias")){ uH =>
-        uH.handler ! QueVivanLasNovias(msg)
-      }
-    }
-
-  }
 
   val startHelpRegex = "\\/start|\\/help".r
 
@@ -206,14 +147,7 @@ extends BotWithAdmin(token, adminId)
     import BodaBotUserActor._
     override def receive = {
       case RespondMsg(resp,msg) if shouldRespond(msg) => reply(resp(botUser.name))(msg)
-      case CuandoMsg(msg) if shouldRespond(msg) =>  reply(cuandoResponse)(msg)
-      case DondeMsg(msg) if shouldRespond(msg) =>  reply(dondeResponse)(msg)
-      case CuantoMsg(msg) if shouldRespond(msg) =>  reply(cuantoResponse(botUser.name))(msg)
-      case HolaMsg(msg) if shouldRespond(msg) =>  reply(holaResponse(botUser.name))(msg)
-      case SaeiMsg(msg) if shouldRespond(msg) =>  reply(saeiResponse(botUser.name))(msg)
       case UnknownMsg(msg) if shouldRespond(msg) => reply(unknownResponse(botUser.name))(msg)
-      case QuienMsg(msg) if shouldRespond(msg) => reply(quienResponse(botUser.name))(msg)
-      case QueVivanLasNovias(msg) if shouldRespond(msg) => reply(queVivanLasNoviasResponse)(msg)
       case RemoveOldMessages => removeOldMessages()
       case _ =>
     }

@@ -45,9 +45,9 @@ trait BodaBotResponses { this: BotWithAdmin =>
   }
 
 
-  val cuandoResponse: String = "La boda será el día 24 de Julio de 2021 a las 12h. :wedding: :couplekiss_woman_woman:".emojize
+  val cuandoResponse = (_:String) => "La boda será el día 24 de Julio de 2021 a las 12h. :wedding: :couplekiss_woman_woman:".emojize
 
-  val dondeResponse:String = "La boda será en Gijón. :sunrise_over_mountains:".emojize
+  val dondeResponse = (_:String) => "La boda será en Gijón. :sunrise_over_mountains:".emojize
 
   val holaResponse = (name: String) => {
     Seq(
@@ -56,7 +56,7 @@ trait BodaBotResponses { this: BotWithAdmin =>
     ).chooseRandom()
   }
 
-  def cuantoResponse(name: String) = Seq(
+  val cuantoResponse = (name: String) => Seq(
     s"Tranquilo $name, ¡ya sólo quedan ${daysToWedding()} días para la boda! :partying_face:".emojize
     , s"Tranquilo $name, ¡ya sólo quedan ${minutesToWedding()} minutos para la boda! :champagne:".emojize
     ,s"Tranquilo $name, ¡ya sólo quedan ${secondsToWedding()} segundos para la boda! :fireworks:".emojize
@@ -75,7 +75,7 @@ trait BodaBotResponses { this: BotWithAdmin =>
     s"Lo siento $name, no sé qué me quieres decir. :sweat_smile:".emojize
   ).chooseRandom()
 
-  def quienResponse(name: String) = Seq(
+  val quienResponse = (name: String) => Seq(
     s"..."
   ).chooseRandom()
 
@@ -83,5 +83,5 @@ trait BodaBotResponses { this: BotWithAdmin =>
     s"¡Que vivan las novias! :partying_face::champagne::partying_face::champagne::partying_face::champagne::partying_face::champagne:".emojize
   )
 
-  def queVivanLasNoviasResponse = queVivanLasNoviasResponseSeq.chooseRandom()
+  val queVivanLasNoviasResponse = (name: String) => queVivanLasNoviasResponseSeq.chooseRandom()
 }
