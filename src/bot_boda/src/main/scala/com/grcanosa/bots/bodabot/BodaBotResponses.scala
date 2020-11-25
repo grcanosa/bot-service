@@ -78,4 +78,10 @@ trait BodaBotResponses { this: BotWithAdmin =>
   def quienResponse(name: String) = Seq(
     s"..."
   ).chooseRandom()
+
+  private val queVivanLasNoviasResponseSeq = Seq(
+    s"¡Que vivan las novias! :partying_face::champagne::partying_face::champagne::partying_face::champagne::partying_face::champagne:".emojize
+  )
+
+  def queVivanLasNoviasResponse = queVivanLasNoviasResponseSeq.chooseRandom()
 }

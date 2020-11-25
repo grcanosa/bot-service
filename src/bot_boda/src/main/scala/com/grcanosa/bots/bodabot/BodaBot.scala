@@ -78,6 +78,7 @@ extends BotWithAdmin(token, adminId)
     case class HolaMsg(msg: Message)
     case class SaeiMsg(msg: Message)
     case class QuienMsg(msg: Message)
+    case class QueVivanLasNovias(ms: Message)
     case class UnknownMsg(msg: Message)
   }
   import BodaBotUserActor._
@@ -130,6 +131,15 @@ extends BotWithAdmin(token, adminId)
         uH.handler ! CuantoMsg(msg)
       }
     }
+  }
+
+  onRegex("(?i)\\bMer(?:cedes)?\\b|\\bIsa(?:bel)?\\b".r){implicit msg =>
+    _ => {
+      allowedUser(Some("novias")){ uH =>
+        uH.handler ! QueVivanLasNovias(msg)
+      }
+    }
+
   }
 
   val startHelpRegex = "\\/start|\\/help".r
@@ -185,6 +195,7 @@ extends BotWithAdmin(token, adminId)
       case SaeiMsg(msg) if shouldRespond(msg) =>  reply(saeiResponse(botUser.name))(msg)
       case UnknownMsg(msg) if shouldRespond(msg) => reply(unknownResponse(botUser.name))(msg)
       case QuienMsg(msg) if shouldRespond(msg) => reply(quienResponse(botUser.name))(msg)
+      case QueVivanLasNovias(msg) if shouldRespond(msg) => reply(queVivanLasNoviasResponse)(msg)
       case RemoveOldMessages => removeOldMessages()
       case _ =>
     }
