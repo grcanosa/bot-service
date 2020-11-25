@@ -17,6 +17,7 @@ import com.typesafe.config.Config
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationInt
+import scala.util.matching.Regex
 
 object BodaBot {
 
@@ -72,6 +73,7 @@ extends BotWithAdmin(token, adminId)
 
   object BodaBotUserActor{
     case object RemoveOldMessages
+    case class RespondMsg(r: String=> String,msg:Message)
     case class CuandoMsg(msg: Message)
     case class DondeMsg(msg: Message)
     case class CuantoMsg(msg: Message)
@@ -80,26 +82,41 @@ extends BotWithAdmin(token, adminId)
     case class QuienMsg(msg: Message)
     case class QueVivanLasNovias(ms: Message)
     case class UnknownMsg(msg: Message)
+
+    val regexInteractionsResponsesMatches: Seq[(Regex, String, String => String)] = Seq(
+      ("(?i).*hola.*|.*ey.*|.*buenas.*|".r,"hola",holaResponse)
+      ,("(?i).*sae+i+.*|.*marian.*".r,"saei",saeiResponse)
+    )
   }
   import BodaBotUserActor._
 
 
-
-  onRegex("(?i).*hola.*|.*ey.*|.*buenas.*|".r){ implicit msg =>
-    groups => {
-      allowedUser(Some("hola")){ uH =>
-        uH.handler ! HolaMsg(msg)
+  regexInteractionsResponsesMatches.foreach{ case (r,i,resp) =>
+    onRegex(r){implicit msg =>
+      groups => {
+        allowedUser(Some(i)){ uH =>
+          uH.handler ! RespondMsg(resp,msg)
+        }
       }
     }
   }
 
-  onRegex("(?i).*sae+i+.*|.*marian.*".r){implicit msg =>
-    groups => {
-      allowedUser(Some("saei")){ uH =>
-        uH.handler ! SaeiMsg(msg)
-      }
-    }
-  }
+//
+//  onRegex("(?i).*hola.*|.*ey.*|.*buenas.*|".r){ implicit msg =>
+//    groups => {
+//      allowedUser(Some("hola")){ uH =>
+//        uH.handler ! HolaMsg(msg)
+//      }
+//    }
+//  }
+//
+//  onRegex("(?i).*sae+i+.*|.*marian.*".r){implicit msg =>
+//    groups => {
+//      allowedUser(Some("saei")){ uH =>
+//        uH.handler ! SaeiMsg(msg)
+//      }
+//    }
+//  }
 
   onRegex("(?i).*qui[eé]n.*".r){implicit msg =>
     groups => {
@@ -188,6 +205,7 @@ extends BotWithAdmin(token, adminId)
     timers.startTimerAtFixedRate("remove_old_messages_timer",RemoveOldMessages,1 minute)
     import BodaBotUserActor._
     override def receive = {
+      case RespondMsg(resp,msg) if shouldRespond(msg) => reply(resp(botUser.name))(msg)
       case CuandoMsg(msg) if shouldRespond(msg) =>  reply(cuandoResponse)(msg)
       case DondeMsg(msg) if shouldRespond(msg) =>  reply(dondeResponse)(msg)
       case CuantoMsg(msg) if shouldRespond(msg) =>  reply(cuantoResponse(botUser.name))(msg)

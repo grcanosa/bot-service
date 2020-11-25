@@ -49,7 +49,7 @@ trait BodaBotResponses { this: BotWithAdmin =>
 
   val dondeResponse:String = "La boda será en Gijón. :sunrise_over_mountains:".emojize
 
-  def holaResponse(name: String) = {
+  val holaResponse = (name: String) => {
     Seq(
       s"Hola $name, ¿qué tal todo? ¿Con ganas de boda? :partying_face:".emojize
       ,s"${getGreetingBasedOnTime(name)}".emojize
@@ -68,7 +68,7 @@ trait BodaBotResponses { this: BotWithAdmin =>
     , s":lips::lips::lips::lips::lips::lips::lips::lips::lips::lips::lips::lips::lips::lips::lips::lips::lips::lips::lips:".emojize
   )
 
-  def saeiResponse(name: String) = saeiResponseSeq.chooseRandom()
+  val saeiResponse = (name: String) => saeiResponseSeq.chooseRandom()
 
 
   def unknownResponse(name: String) = Seq(
