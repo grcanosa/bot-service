@@ -51,6 +51,7 @@ lazy val bot_boda = project
     name := "bot_boda"
     ,libraryDependencies ++= testDeps
     , libraryDependencies += "com.danielasfregola" %% "twitter4s" % "7.0"
+    , libraryDependencies += "org.jsoup" % "jsoup" % "1.13.1"
   )
   .dependsOn(
     library

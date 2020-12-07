@@ -55,6 +55,7 @@ trait TwitterMessages{ this: BotWithAdmin =>
 
   def createDailyTweet() = {
     twitterClient.createTweet(getDailyTweetText(), latitude = None, longitude = None)
+    //twitterClient.
   }
 
 
