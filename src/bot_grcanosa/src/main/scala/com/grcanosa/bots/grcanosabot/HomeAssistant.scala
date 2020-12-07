@@ -35,15 +35,19 @@ trait HomeAssistant extends LazyBotLogging{ this: BotWithAdmin =>
 
   def getTermoState () = Http().singleRequest(termoStateRequestGet)
     .flatMap { resp =>
-      botlog.info(s"${resp.toString}")
-      resp.entity.toStrict(1 second).map { strict =>
-        val str = strict.data.utf8String
-        botlog.info(s"JSON IS: $str")
-        //println(str.parseJson.asJsObject.fields)
-        str.parseJson.asJsObject.fields("state") match {
-          case JsString(v) => v.toDouble
-          case _ => 0.toDouble
+      if(resp.status == StatusCodes.OK) {
+        botlog.info(s"${resp.toString}")
+        resp.entity.toStrict(1 second).map { strict =>
+          val str = strict.data.utf8String
+          botlog.info(s"JSON IS: $str")
+          //println(str.parseJson.asJsObject.fields)
+          str.parseJson.asJsObject.fields("state") match {
+            case JsString(v) => v.toDouble
+            case _ => 0.toDouble
+          }
         }
+      }else{
+        throw new Exception(s"Problem getting state, response code is ${resp.status}")
       }
     }
 
