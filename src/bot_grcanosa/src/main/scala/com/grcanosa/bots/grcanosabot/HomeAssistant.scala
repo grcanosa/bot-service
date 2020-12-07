@@ -35,10 +35,10 @@ trait HomeAssistant extends LazyBotLogging{ this: BotWithAdmin =>
 
   def getTermoState () = Http().singleRequest(termoStateRequestGet)
     .flatMap { resp =>
-      //BOTLOG.info(s"${resp.toString}")
+      botlog.info(s"${resp.toString}")
       resp.entity.toStrict(1 second).map { strict =>
         val str = strict.data.utf8String
-        //BOTLOG.info(s"JSON IS: $str")
+        botlog.info(s"JSON IS: $str")
         //println(str.parseJson.asJsObject.fields)
         str.parseJson.asJsObject.fields("state") match {
           case JsString(v) => v.toDouble
@@ -60,7 +60,11 @@ trait HomeAssistant extends LazyBotLogging{ this: BotWithAdmin =>
 
   def addTermoMinutes(min: Int): Future[Double] = {
     botlog.info(s"Increasing termo $min minutes")
-    getTermoState().flatMap{ st =>
+    val f = getTermoState()
+    f.failed.foreach{
+      case th => botlog.info(s"Problem getting termo state",th)
+    }
+    f.flatMap{ st =>
       botlog.info(s"State is $st ")
       val new_time: Double = st + min
       val termo_state = termoValueJson(new_time)
