@@ -123,6 +123,20 @@ trait TwitterPalabras  {this: BotWithAdmin =>
 
   var lastCheckedTweet: Option[Long] = None
 
+  def updateIfLarger(l1: Option[Long],l2: Option[Long]) = {
+    if(l1.isEmpty){
+      l2
+    }else if(l2.isEmpty){
+      l1
+    }else{
+      if(l1.get < l2.get){
+        l2
+      }else{
+        l1
+      }
+    }
+  }
+
   def checkPalabrasMentions() = {
     palabrasTwitterClient.mentionsTimeline(since_id = None).foreach{ r =>
       r.data.foreach{ tweet =>
@@ -134,7 +148,8 @@ trait TwitterPalabras  {this: BotWithAdmin =>
           palabrasTwitterClient.createTweet(chain,in_reply_to_status_id = Some(tweet.id))
         }
       }
-      lastCheckedTweet = Try{Some(r.data.map(_.id).max)}.getOrElse(None)
+      val newLastChecked = Try{Some(r.data.map(_.id).max)}.getOrElse(None)
+      lastCheckedTweet = updateIfLarger(lastCheckedTweet,newLastChecked)
     }
   }
 
