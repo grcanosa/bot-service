@@ -102,7 +102,7 @@ trait TwitterPalabras  {this: BotWithAdmin =>
   }
 
 
-  val timerPalabras = system.scheduler.scheduleWithFixedDelay(30 seconds,1 minute,selfActor, CheckPalabrasMentions)
+
 
   def palabrasTwitterBehaviour: Receive = {
     case PalabrasTweet => {
