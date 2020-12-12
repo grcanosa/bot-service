@@ -147,7 +147,7 @@ trait TwitterPalabras  {this: BotWithAdmin =>
           tweet.user.foreach{u =>
             val chain = getWordChain(s,TwitterPalabras.palabras).mkString("\n")
             val txt = s"@${u.screen_name}\n$chain"
-            palabrasTwitterClient.createTweet(chain,in_reply_to_status_id = Some(tweet.id))
+            palabrasTwitterClient.createTweet(txt,in_reply_to_status_id = Some(tweet.id))
           }
         }
       }
