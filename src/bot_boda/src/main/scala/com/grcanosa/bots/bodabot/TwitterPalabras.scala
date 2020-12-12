@@ -2,12 +2,12 @@ package com.grcanosa.bots.bodabot
 
 import akka.Done
 import akka.actor.Actor.Receive
-import akka.actor.ActorRef
+import akka.actor.{ActorRef, Timers}
 import com.bot4s.telegram.methods.SendMessage
 import com.danielasfregola.twitter4s.TwitterRestClient
 import com.grcanosa.bots.bodabot.ExtraerPalabras.{getWordRegexList, path}
 import com.grcanosa.bots.bodabot.TwitterMessages.DailyTweet
-import com.grcanosa.bots.bodabot.TwitterPalabras.PalabrasTweet
+import com.grcanosa.bots.bodabot.TwitterPalabras.{CheckPalabrasMentions, PalabrasTweet, getWordChain}
 import com.grcanosa.telegrambot.bot.BotWithAdmin
 import com.grcanosa.telegrambot.utils.BotUtils
 
@@ -63,6 +63,7 @@ object TwitterPalabras{
   }
 
   case object PalabrasTweet
+  case object CheckPalabrasMentions
 
 }
 
@@ -100,6 +101,11 @@ trait TwitterPalabras  {this: BotWithAdmin =>
     case Failure(e) => botlog.error(s"COMPLETED ERROR",e)
   }
 
+
+  val timerPalabras = system.scheduler.scheduleAtFixedRate(0 seconds,1 minute){ _ =>
+    selfActor ! CheckPalabrasMentions
+  }
+
   def palabrasTwitterBehaviour: Receive = {
     case PalabrasTweet => {
       botlog.info(s"Creating daily tweet")
@@ -109,6 +115,26 @@ trait TwitterPalabras  {this: BotWithAdmin =>
           botActor ! SendMessage(adminId,"Palabras Tweet creado correctamente")
         }
         case Failure(e) => botlog.error(s"Error in tweet",e)
+      }
+    }
+    case CheckPalabrasMentions => {
+      checkPalabrasMentions()
+    }
+  }
+
+  var lastCheckedTime = java.time.Instant.now().getEpochSecond
+
+  def checkPalabrasMentions() = {
+    palabrasTwitterClient.mentionsTimeline(since_id = Some(lastCheckedTime)).foreach{ r =>
+      lastCheckedTime = java.time.Instant.now().getEpochSecond
+      r.data.foreach{ tweet =>
+        botlog.info(s"Analyzing: ${tweet.text}")
+        val words = tweet.text.split(" ")
+        val wordToAnalyze = words.find(w => !w.startsWith("@") && !w.startsWith("#"))
+        wordToAnalyze.foreach{ s =>
+          val chain = getWordChain(s,TwitterPalabras.palabras).mkString("\n")
+          palabrasTwitterClient.createTweet(chain,in_reply_to_status_id = Some(tweet.id))
+        }
       }
     }
   }
