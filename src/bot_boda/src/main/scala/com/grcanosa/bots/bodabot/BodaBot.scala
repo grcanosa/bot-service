@@ -81,7 +81,7 @@ extends BotWithAdmin(token, adminId)
   override val defaultUserPermission: BotUser.BotUserPermission = PERMISSION_NOT_SET
 
   val selfActor: ActorRef = system.actorOf(Props(new BodaBotActor()))
-  val timerPalabras = system.scheduler.scheduleWithFixedDelay(30 seconds,1 minute,selfActor, CheckPalabrasMentions)
+  val timerPalabras = system.scheduler.scheduleWithFixedDelay(30 seconds,20 seconds,selfActor, CheckPalabrasMentions)
   object BodaBotUserActor{
     case object RemoveOldMessages
     case class RespondMsg(r: String=> String,msg:Message)

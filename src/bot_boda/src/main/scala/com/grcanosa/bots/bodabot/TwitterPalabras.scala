@@ -116,7 +116,7 @@ trait TwitterPalabras  {this: BotWithAdmin =>
       }
     }
     case CheckPalabrasMentions => {
-      botlog.info(s"Checking mentions")
+      //botlog.info(s"Checking mentions")
       checkPalabrasMentions()
     }
   }
