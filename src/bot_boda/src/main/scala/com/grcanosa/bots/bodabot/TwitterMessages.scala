@@ -40,7 +40,7 @@ trait TwitterMessages{ this: BotWithAdmin =>
     case Failure(e) => botlog.error(s"COMPLETED ERROR",e)
   }
 
-  def twitterBehaviour: Receive = {
+  def bodaTwitterBehaviour: Receive = {
     case DailyTweet => {
       botlog.info(s"Creating daily tweet")
       createDailyTweet().onComplete{
