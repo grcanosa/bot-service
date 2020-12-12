@@ -15,7 +15,7 @@ import java.time.LocalDateTime
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
 import scala.io.Source
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 
 object TwitterPalabras{
 
@@ -116,15 +116,15 @@ trait TwitterPalabras  {this: BotWithAdmin =>
       }
     }
     case CheckPalabrasMentions => {
+      botlog.info(s"Checking mentions")
       checkPalabrasMentions()
     }
   }
 
-  var lastCheckedTime = java.time.Instant.now().getEpochSecond
+  var lastCheckedTweet: Option[Long] = None
 
   def checkPalabrasMentions() = {
-    palabrasTwitterClient.mentionsTimeline(since_id = Some(lastCheckedTime)).foreach{ r =>
-      lastCheckedTime = java.time.Instant.now().getEpochSecond
+    palabrasTwitterClient.mentionsTimeline(since_id = None).foreach{ r =>
       r.data.foreach{ tweet =>
         botlog.info(s"Analyzing: ${tweet.text}")
         val words = tweet.text.split(" ")
@@ -134,6 +134,7 @@ trait TwitterPalabras  {this: BotWithAdmin =>
           palabrasTwitterClient.createTweet(chain,in_reply_to_status_id = Some(tweet.id))
         }
       }
+      lastCheckedTweet = Try{Some(r.data.map(_.id).max)}.getOrElse(None)
     }
   }
 
