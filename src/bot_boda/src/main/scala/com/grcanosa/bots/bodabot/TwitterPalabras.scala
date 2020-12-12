@@ -144,8 +144,11 @@ trait TwitterPalabras  {this: BotWithAdmin =>
         val words = tweet.text.split(" ")
         val wordToAnalyze = words.find(w => !w.startsWith("@") && !w.startsWith("#"))
         wordToAnalyze.foreach{ s =>
-          val chain = getWordChain(s,TwitterPalabras.palabras).mkString("\n")
-          palabrasTwitterClient.createTweet(chain,in_reply_to_status_id = Some(tweet.id))
+          tweet.user.foreach{u =>
+            val chain = getWordChain(s,TwitterPalabras.palabras).mkString("\n")
+            val txt = s"@${u.screen_name}\n$chain"
+            palabrasTwitterClient.createTweet(chain,in_reply_to_status_id = Some(tweet.id))
+          }
         }
       }
       val newLastChecked = Try{Some(r.data.map(_.id).max)}.getOrElse(None)
