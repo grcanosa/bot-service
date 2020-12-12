@@ -138,7 +138,7 @@ trait TwitterPalabras  {this: BotWithAdmin =>
   }
 
   def checkPalabrasMentions() = {
-    palabrasTwitterClient.mentionsTimeline(since_id = None).foreach{ r =>
+    palabrasTwitterClient.mentionsTimeline(since_id = lastCheckedTweet).foreach{ r =>
       r.data.foreach{ tweet =>
         botlog.info(s"Analyzing: ${tweet.text}")
         val words = tweet.text.split(" ")
