@@ -156,8 +156,17 @@ trait TwitterPalabras  {this: BotWithAdmin =>
     }
   }
 
+  def getNewChainMinSize(minSize: Int): List[String] = {
+    val ch = getNewChain()
+    if(ch.size >= minSize){
+      ch
+    }else{
+      getNewChainMinSize(minSize)
+    }
+  }
+
   def createPalabrasDailyTweet() = {
-    val wordChain = getNewChain()
+    val wordChain = getNewChainMinSize(3)
     val wordChainTxt = wordChain.mkString("\n")
     palabrasTwitterClient.createTweet(wordChainTxt, latitude = None, longitude = None)
   }
