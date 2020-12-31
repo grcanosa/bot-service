@@ -89,11 +89,11 @@ object Countries {
   def convertToMessages(prefix: String,l: List[String]): List[String] = {
     l.foldLeft(List.empty[String]){ case (join,add) =>
       if(join.nonEmpty && join.head.length + add.length > maxNumberofChars){
-        add :: join
+        s"$prefix"+add :: join
       }else if(join.nonEmpty){
         join.head + s", ${add}" :: join.tail
       }else{
-        List(s"$prefix "+add)
+        List(s"$prefix"+add)
       }
     }
   }
