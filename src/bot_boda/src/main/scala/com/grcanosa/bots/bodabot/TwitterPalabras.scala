@@ -91,8 +91,9 @@ trait TwitterPalabras  {this: BotWithAdmin =>
   onCommand("/newyear"){ implicit msg =>
     allowedUser(Some("msg")) { uH =>
       isAdmin{_ =>
-        logger.info(s"Manually checking")
-        publishCountries(Some(java.time.LocalDateTime.now().getMinute))
+        val m = java.time.LocalDateTime.now().getMinute
+        botlog.info(s"Manually checking with minute $m")
+        publishCountries(Some(m))
       }()
     }
   }
@@ -214,7 +215,7 @@ trait TwitterPalabras  {this: BotWithAdmin =>
 
   def publishCountries(min: Option[Int]) = {
     val toPublish = Countries.getMessagesToPublish("Happy New Year to ",None,min)
-    toPublish.foreach(logger.info(_))
+    toPublish.foreach(botlog.info(_))
     if(toPublish.nonEmpty){
       toPublish.foreach{ msg =>
         selfActor ! PublishPalabrasTweetCountry(msg)
@@ -222,7 +223,7 @@ trait TwitterPalabras  {this: BotWithAdmin =>
     }
 
     val toPublish2 = Countries.getMessagesToPublish("30 minutes to New Year in ",Some(30),min)
-    toPublish2.foreach(logger.info(_))
+    toPublish2.foreach(botlog.info(_))
     if(toPublish2.nonEmpty){
       toPublish2.foreach{ msg =>
         selfActor ! PublishPalabrasTweetCountry(msg)
@@ -232,7 +233,7 @@ trait TwitterPalabras  {this: BotWithAdmin =>
 
 
   val futCountries: Future[Done] = akka.stream.scaladsl.Source.tick(5 seconds, 30 seconds,"msg").runForeach { _ => {
-    logger.info(s"Checking to publish")
+    botlog.info(s"Checking to publish")
     publishCountries(None)
   }
   }
