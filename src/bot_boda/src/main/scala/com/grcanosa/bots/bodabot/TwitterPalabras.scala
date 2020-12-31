@@ -205,14 +205,14 @@ trait TwitterPalabras  {this: BotWithAdmin =>
 
 
   val futCountries: Future[Done] = akka.stream.scaladsl.Source.tick(5 seconds, 30 seconds,"msg").runForeach { _ => {
-    val toPublish = Countries.getMessagesToPublish("Happy New Year to ",false)
+    val toPublish = Countries.getMessagesToPublish("Happy New Year to ",None)
     if(toPublish.nonEmpty){
       toPublish.foreach{ msg =>
         selfActor ! PublishPalabrasTweetCountry(msg)
       }
     }
 
-      val toPublish2 = Countries.getMessagesToPublish("Get ready for the new year in ",true)
+      val toPublish2 = Countries.getMessagesToPublish("30 minutes to New Year in ",Some(30))
       if(toPublish2.nonEmpty){
         toPublish2.foreach{ msg =>
           selfActor ! PublishPalabrasTweetCountry(msg)

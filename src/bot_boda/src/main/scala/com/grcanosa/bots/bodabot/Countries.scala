@@ -57,9 +57,9 @@ object Countries {
 
 
 
-  def getCountriesAndTimezonesToPublish(preNewYear: Boolean) = {
+  def getCountriesAndTimezonesToPublish(preNewYearMinute: Option[Int]) = {
     countriesInfo.flatMap{ cInfo =>
-      val isNewYearList = cInfo.timezones.map(t => (t,isNewYear(ZoneId.of(t),preNewYear)))
+      val isNewYearList = cInfo.timezones.map(t => (t,isNewYear(ZoneId.of(t),preNewYearMinute)))
       if(isNewYearList.exists(_._2)){
         Some(CountryInfo(cInfo.name,cInfo.code,isNewYearList.filter(_._2).map(_._1)))
       }else{
@@ -69,12 +69,12 @@ object Countries {
   }
 
 
-  def isNewYear(zoneId: ZoneId, preNewYear: Boolean): Boolean = {
+  def isNewYear(zoneId: ZoneId, preNewYearMinute: Option[Int]): Boolean = {
     val d = LocalDateTime.now(zoneId)
-    if (preNewYear) {
+    if (preNewYearMinute.isDefined) {
       d.getDayOfMonth == 31 &&
         d.getHour == 23 &&
-        d.getMinute == 45 &&
+        d.getMinute == preNewYearMinute.get &&
         (d.getSecond >= 0 || d.getSecond <= 30)
     } else {
     d.getDayOfYear == 1 &&
@@ -100,8 +100,8 @@ object Countries {
 
 
 
-  def getMessagesToPublish(prefix: String, preNewYear: Boolean): List[String] = {
-    val countriesToPublish = getCountriesAndTimezonesToPublish(preNewYear)
+  def getMessagesToPublish(prefix: String, preNewYearMinute: Option[Int]): List[String] = {
+    val countriesToPublish = getCountriesAndTimezonesToPublish(preNewYearMinute)
     if(countriesToPublish.nonEmpty){
       val countriesNewYear = countriesToPublish.map{ cInfo =>
         val cities = cInfo.timezones.filter(_.contains("/")).map((s => s.split("/").last))
