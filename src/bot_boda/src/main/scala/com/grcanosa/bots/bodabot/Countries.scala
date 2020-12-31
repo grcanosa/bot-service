@@ -58,10 +58,11 @@ object Countries extends LazyLogging{
   }.toList
 
 
+  import scala.util.Try
 
   def getCountriesAndTimezonesToPublish(preNewYearMinute: Option[Int], min: Option[Int]) = {
     countriesInfo.flatMap{ cInfo =>
-      val isNewYearList = cInfo.timezones.map(t => (t,isNewYear(ZoneId.of(t),preNewYearMinute, min)))
+      val isNewYearList = cInfo.timezones.map(t => (t,Try{isNewYear(ZoneId.of(t),preNewYearMinute, min)}.getOrElse(false)))
       if(isNewYearList.exists(_._2)){
         Some(CountryInfo(cInfo.name,cInfo.code,isNewYearList.filter(_._2).map(_._1)))
       }else{
