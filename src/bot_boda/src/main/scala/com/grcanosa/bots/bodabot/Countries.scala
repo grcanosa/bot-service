@@ -1,5 +1,7 @@
 package com.grcanosa.bots.bodabot
 
+import slogging.LazyLogging
+
 import java.time.{LocalDateTime, ZoneId}
 import java.util.Locale
 import scala.collection.JavaConverters._
@@ -7,7 +9,7 @@ import scala.collection.immutable
 import scala.io.Source
 
 
-object Countries {
+object Countries extends LazyLogging{
 
   val countryCodes = Locale.getISOCountries().toList
   val countries1 = countryCodes.map{ code =>
@@ -57,9 +59,9 @@ object Countries {
 
 
 
-  def getCountriesAndTimezonesToPublish(preNewYearMinute: Option[Int]) = {
+  def getCountriesAndTimezonesToPublish(preNewYearMinute: Option[Int], min: Option[Int]) = {
     countriesInfo.flatMap{ cInfo =>
-      val isNewYearList = cInfo.timezones.map(t => (t,isNewYear(ZoneId.of(t),preNewYearMinute)))
+      val isNewYearList = cInfo.timezones.map(t => (t,isNewYear(ZoneId.of(t),preNewYearMinute, min)))
       if(isNewYearList.exists(_._2)){
         Some(CountryInfo(cInfo.name,cInfo.code,isNewYearList.filter(_._2).map(_._1)))
       }else{
@@ -69,9 +71,15 @@ object Countries {
   }
 
 
-  def isNewYear(zoneId: ZoneId, preNewYearMinute: Option[Int]): Boolean = {
+  def isNewYear(zoneId: ZoneId, preNewYearMinute: Option[Int], min: Option[Int]): Boolean = {
     val d = LocalDateTime.now(zoneId)
-    if (preNewYearMinute.isDefined) {
+    if(min.isDefined){
+      d.getDayOfMonth == 31 &&
+        d.getHour == 23 &&
+        d.getMinute == min.get &&
+        (d.getSecond >= 0 || d.getSecond <= 30)
+    }
+    else if (preNewYearMinute.isDefined) {
       d.getDayOfMonth == 31 &&
         d.getHour == 23 &&
         d.getMinute == preNewYearMinute.get &&
@@ -100,8 +108,9 @@ object Countries {
 
 
 
-  def getMessagesToPublish(prefix: String, preNewYearMinute: Option[Int]): List[String] = {
-    val countriesToPublish = getCountriesAndTimezonesToPublish(preNewYearMinute)
+  def getMessagesToPublish(prefix: String, preNewYearMinute: Option[Int], min: Option[Int] = None): List[String] = {
+    logger.info(s"Prefix $prefix preNewyearMinute $preNewYearMinute min $min")
+    val countriesToPublish = getCountriesAndTimezonesToPublish(preNewYearMinute, min)
     if(countriesToPublish.nonEmpty){
       val countriesNewYear = countriesToPublish.map{ cInfo =>
         val cities = cInfo.timezones.filter(_.contains("/")).map((s => s.split("/").last))
