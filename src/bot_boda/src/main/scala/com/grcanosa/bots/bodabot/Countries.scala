@@ -2,7 +2,7 @@ package com.grcanosa.bots.bodabot
 
 import slogging.LazyLogging
 
-import java.time.{LocalDateTime, ZoneId}
+import java.time.{LocalDateTime, Month, ZoneId}
 import java.util.Locale
 import scala.collection.JavaConverters._
 import scala.collection.immutable
@@ -75,6 +75,7 @@ object Countries extends LazyLogging{
   def isNewYear(zoneId: ZoneId, preNewYearMinute: Option[Int], min: Option[Int]): Boolean = {
     val d = LocalDateTime.now(zoneId)
     if(min.isDefined){
+      d.getMonth == Month.DECEMBER &&
       d.getDayOfMonth == 31 &&
         d.getHour == 23 &&
         d.getMinute == min.get &&
