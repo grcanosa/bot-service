@@ -41,6 +41,79 @@ object TwitterPalabras{
     }.reverse.map(_.r)
   }
 
+  def getLongestWordChain(word: String, allWords: List[String]) = {
+    val allInterestingWords = allWords.filter(_.length == word.length)
+    def getLongestWordChainRec(curr: List[List[String]],maxPreviousLength: Int): List[List[String]] = {
+      val newList: List[List[String]] = curr.flatMap{ listW =>
+        val lastW = listW.last
+        val newWords = getAllWordsFromWord(lastW,listW,allInterestingWords)
+        newWords match {
+          case Nil => List(listW)
+          case l => l.map(w => listW :+ w)
+        }
+      }
+      val maxLength = newList.map(_.size).max
+      val newListFilter = newList.filter(_.size == maxLength)
+      if(maxLength > maxPreviousLength){
+        getLongestWordChainRec(newListFilter,maxLength)
+      }else{
+        newListFilter
+      }
+    }
+    getLongestWordChainRec(List(List(word)),1)
+  }
+
+  def getLongestWordChain2(word: String, allWords: List[String]) = {
+    val allInterestingWords = allWords.filter(_.length == word.length)
+    def getRec(maxSize: Int,maxLists: List[List[String]], toCheckList: List[List[String]], previousExpansions: Map[String,Seq[String]]): List[List[String]] = {
+      if(toCheckList.isEmpty){
+        maxLists
+      }else {
+        println(s"MaxSize is $maxSize, maxLists has size ${maxLists.size} to check ${toCheckList.size}")
+        val toExpand = toCheckList.head
+        println(s"Expanding ${toExpand.mkString(",")}")
+        val lastWord = toExpand.last
+        val newWords = getAllWordsFromWordNoExpansion(lastWord, allInterestingWords,previousExpansions)
+        val newWordsValid = newWords.filter(w => ! toExpand.contains(w))
+        val updatedExpansions = previousExpansions + (lastWord -> newWords)
+        if (newWordsValid.isEmpty) {
+          getRec(maxSize, maxLists, toCheckList.tail,updatedExpansions)
+        } else {
+          val newSize = toExpand.size + 1
+          val newLists = newWordsValid.map(w => toExpand :+ w).toList
+          if (newSize > maxSize) {
+            getRec(newSize, newLists, newLists ++ toCheckList.tail,updatedExpansions)
+          } else if (newSize == maxSize) {
+            getRec(newSize, newLists ++ maxLists, newLists ++ toCheckList.tail,updatedExpansions)
+          } else {
+            getRec(maxSize, maxLists, newLists ++ toCheckList.tail,updatedExpansions)
+          }
+        }
+      }
+    }
+    Thread.sleep(5)
+    getRec(1,List(List(word)),List(List(word)),Map.empty[String,Seq[String]])
+
+  }
+
+  def getAllWordsFromWordNoExpansion(word: String,allWords: List[String], previousExpansions: Map[String,Seq[String]]): Seq[String] = {
+    previousExpansions.get(word) match {
+      case Some(l) => l
+      case None => getAllWordsFromWord(word,List(word),allWords)
+    }
+  }
+
+  def getAllWordsFromWord(word: String,previousWords: List[String],allWords: List[String]): Seq[String] = {
+    val regexList = getWordRegexList(word)
+    regexList.flatMap{ reg =>
+      allWords.filter{ w =>
+        w.length == word.length &&
+        !previousWords.contains(w) &&
+          reg.findFirstIn(w).isDefined
+      }
+    }
+  }
+
   def getWordChain(word: String, allWords: List[String]): List[String] = {
     def getWordChainRecursive(lastWord: String, prevWords: List[String]): List[String] = {
       val newWord: Option[String] = getWordRegexList(lastWord)
