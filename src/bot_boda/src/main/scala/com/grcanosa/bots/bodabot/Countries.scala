@@ -82,11 +82,13 @@ object Countries extends LazyLogging{
         (d.getSecond >= 0 || d.getSecond <= 30)
     }
     else if (preNewYearMinute.isDefined) {
+      d.getMonth == Month.DECEMBER &&
       d.getDayOfMonth == 31 &&
         d.getHour == 23 &&
         d.getMinute == preNewYearMinute.get &&
         (d.getSecond >= 0 || d.getSecond <= 30)
     } else {
+      d.getMonth == Month.DECEMBER &&
     d.getDayOfYear == 1 &&
       d.getHour == 0 &&
       d.getMinute == 0 &&
