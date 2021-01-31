@@ -7,7 +7,7 @@ import com.bot4s.telegram.methods.SendMessage
 import com.danielasfregola.twitter4s.TwitterRestClient
 import com.grcanosa.bots.bodabot.ExtraerPalabras.{getWordRegexList, path}
 import com.grcanosa.bots.bodabot.TwitterMessages.DailyTweet
-import com.grcanosa.bots.bodabot.TwitterPalabras.{CheckPalabrasMentions, PalabrasTweet, getWordChain}
+import com.grcanosa.bots.bodabot.TwitterPalabras.{CheckPalabrasMentions, PalabrasTweet, PublishPalabrasTweetCountry, getWordChain}
 import com.grcanosa.telegrambot.bot.BotWithAdmin
 import com.grcanosa.telegrambot.utils.BotUtils
 
@@ -138,6 +138,8 @@ object TwitterPalabras{
   case object PalabrasTweet
   case object CheckPalabrasMentions
 
+  case class PublishPalabrasTweetCountry(msg: String)
+
 }
 
 trait TwitterPalabras  {this: BotWithAdmin =>
@@ -159,6 +161,17 @@ trait TwitterPalabras  {this: BotWithAdmin =>
     }
   }
 
+  onCommand("/newyear"){ implicit msg =>
+    allowedUser(Some("msg")) { uH =>
+      isAdmin{_ =>
+        val m = java.time.LocalDateTime.now().getMinute
+        botlog.info(s"Manually checking with minute $m")
+        publishCountries(Some(m))
+      }()
+    }
+  }
+
+
 
 
   val futPalabras: Future[Done] = akka.stream.scaladsl.Source.tick(5 seconds, 1 minute,"msg").runForeach { _ => {
@@ -177,6 +190,8 @@ trait TwitterPalabras  {this: BotWithAdmin =>
 
 
 
+
+
   def palabrasTwitterBehaviour: Receive = {
     case PalabrasTweet => {
       botlog.info(s"Creating daily tweet")
@@ -186,6 +201,12 @@ trait TwitterPalabras  {this: BotWithAdmin =>
           botActor ! SendMessage(adminId,"Palabras Tweet creado correctamente")
         }
         case Failure(e) => botlog.error(s"Error in tweet",e)
+      }
+    }
+    case PublishPalabrasTweetCountry(msg) => {
+      palabrasTwitterClient.createTweet(msg, latitude = None, longitude = None).onComplete{
+        case Success(t) => logger.info(s"Published $msg")
+        case Failure(e) => logger.error(s"Error publishing $msg",e)
       }
     }
     case CheckPalabrasMentions => {
@@ -243,5 +264,61 @@ trait TwitterPalabras  {this: BotWithAdmin =>
     val wordChainTxt = wordChain.mkString("\n")
     palabrasTwitterClient.createTweet(wordChainTxt, latitude = None, longitude = None)
   }
+
+
+
+
+
+//  //new year
+//  def publishNewYear() = {
+//    val countriesToPublish =
+//
+//    val countryCodes = Countries.zoneIds.flatMap{ z =>
+//      val localDate = LocalDateTime.now(z)
+//      if(localDate.getDayOfYear == 1
+//        && localDate.getHour == 0
+//        && localDate.getMinute == 0
+//        && localDate.getSecond > 0 && localDate.getSecond < 30){
+//        Some(z)
+//      }else{
+//        None
+//      }
+//    }
+//  }
+
+  def publishCountries(min: Option[Int]) = {
+    val toPublish = Countries.getMessagesToPublish("Happy New Year to ",None,min)
+    toPublish.foreach(botlog.info(_))
+    if(toPublish.nonEmpty){
+      toPublish.foreach{ msg =>
+        selfActor ! PublishPalabrasTweetCountry(msg)
+      }
+    }
+
+    val toPublish2 = Countries.getMessagesToPublish("30 minutes to New Year in ",Some(30),min)
+    toPublish2.foreach(botlog.info(_))
+    if(toPublish2.nonEmpty){
+      toPublish2.foreach{ msg =>
+        selfActor ! PublishPalabrasTweetCountry(msg)
+      }
+    }
+  }
+
+
+  val futCountries: Future[Done] = akka.stream.scaladsl.Source.tick(5 seconds, 30 seconds,"msg").runForeach { _ => {
+    botlog.info(s"Checking to publish")
+    publishCountries(None)
+  }
+  }
+
+  futCountries.onComplete{
+    case Success(_) => botlog.info(s"COMPLETED OK")
+    case Failure(e) => botlog.error(s"COMPLETED ERROR",e)
+  }
+
+
+
+
+
 
 }
