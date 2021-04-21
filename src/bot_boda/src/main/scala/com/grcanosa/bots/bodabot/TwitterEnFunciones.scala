@@ -26,13 +26,13 @@ trait TwitterEnFunciones  {this: BotWithAdmin =>
   import com.grcanosa.telegrambot.utils.BotUtils._
 
 //
-//  onCommand("/palabra"){implicit msg =>
-//    allowedUser(Some("msg")) { uH =>
-//      isAdmin{_ =>
-//        selfActor ! PalabrasTweet
-//      }()
-//    }
-//  }
+  onCommand("/enfunciones"){implicit msg =>
+    allowedUser(Some("msg")) { uH =>
+      isAdmin{_ =>
+        selfActor ! EnFuncionesTweet
+      }()
+    }
+  }
 //
 //  onCommand("/newyear"){ implicit msg =>
 //    allowedUser(Some("msg")) { uH =>
