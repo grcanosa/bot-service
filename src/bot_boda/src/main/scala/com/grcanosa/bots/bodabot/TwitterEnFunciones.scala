@@ -99,7 +99,7 @@ trait TwitterEnFunciones  {this: BotWithAdmin =>
   def createEnFuncionesDailyTweet() = {
     val now = LocalDateTime.now()
     val numberOfDaysExpired = Duration.between(cgpjExpiredDate,now).toDays
-    val txt = s"El CGPJ lleva $numberOfDaysExpired en funciones."
+    val txt = s"El CGPJ lleva $numberOfDaysExpired días en funciones."
     enFuncionesTwitterClient.createTweet(txt, latitude = None, longitude = None)
   }
 
