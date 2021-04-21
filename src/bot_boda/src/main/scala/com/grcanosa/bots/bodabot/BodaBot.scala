@@ -45,20 +45,27 @@ object BodaBot {
     val consumerSecret = config.getString("bot.twitter.consumer-secret")
     val accessKey = config.getString("bot.twitter.access-key")
     val accessSecret = config.getString("bot.twitter.access-secret")
+    val consumerToken = ConsumerToken(key = consumerKey, secret = consumerSecret)
+    val accessToken = AccessToken(key = accessKey, secret = accessSecret)
     val PalabrasconsumerKey = config.getString("bot.palabrastwitter.consumer-key")
     val PalabrasconsumerSecret = config.getString("bot.palabrastwitter.consumer-secret")
     val PalabrasaccessKey = config.getString("bot.palabrastwitter.access-key")
     val PalabrasaccessSecret = config.getString("bot.palabrastwitter.access-secret")
-    val consumerToken = ConsumerToken(key = consumerKey, secret = consumerSecret)
-    val accessToken = AccessToken(key = accessKey, secret = accessSecret)
-
     val PalabrasconsumerToken = ConsumerToken(key = PalabrasconsumerKey, secret = PalabrasconsumerSecret)
     val PalabrasaccessToken = AccessToken(key = PalabrasaccessKey, secret = PalabrasaccessSecret)
 
+    val EnFuncionesconsumerKey = config.getString("bot.enfuncionestwitter.consumer-key")
+    val EnFuncionesconsumerSecret = config.getString("bot.enfuncionestwitter.consumer-secret")
+    val EnFuncionesaccessKey = config.getString("bot.enfuncionestwitter.access-key")
+    val EnFuncionesaccessSecret = config.getString("bot.enfuncionestwitter.access-secret")
+    val EnFuncionesconsumerToken = ConsumerToken(key = EnFuncionesconsumerKey, secret = EnFuncionesconsumerSecret)
+    val EnFuncionesaccessToken = AccessToken(key = EnFuncionesaccessKey, secret = EnFuncionesaccessSecret)
+
     val restClient = TwitterRestClient(consumerToken, accessToken)
     val palabrasRestClient = TwitterRestClient(PalabrasconsumerToken, PalabrasaccessToken)
+    val enfuncionesRestClient = TwitterRestClient(EnFuncionesconsumerToken, EnFuncionesaccessToken)
 
-    val bot = new BodaBot(token,adminId,restClient,palabrasRestClient)
+    val bot = new BodaBot(token,adminId,restClient,palabrasRestClient,enfuncionesRestClient)
     bot
   }
 
@@ -69,11 +76,13 @@ class BodaBot(override val token: String
              , override val adminId: Long
              , val twitterClient: TwitterRestClient
              , val palabrasTwitterClient: TwitterRestClient
+             , val enFuncionesTwitterClient: TwitterRestClient
              )
              (implicit botDao: BotDao)
 extends BotWithAdmin(token, adminId)
   with TwitterMessages
   with TwitterPalabras
+  with TwitterEnFunciones
   with BodaBotResponses
   with RegexCommands
 {
@@ -129,6 +138,7 @@ extends BotWithAdmin(token, adminId)
     override def receive = {
       bodaTwitterBehaviour
         .orElse(palabrasTwitterBehaviour)
+        .orElse(enFuncionesTwitterBehaviour)
         .orElse(bodaBotActorBehaviour)
     }
 
