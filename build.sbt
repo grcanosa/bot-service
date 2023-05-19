@@ -43,6 +43,18 @@ lazy val bot_grcanosa = project
     library
   )
 
+lazy val bot_rocio = project
+  .in(file("src/bot_rocio"))
+  .enablePlugins(PackagingTypePlugin)
+  .disablePlugins(AssemblyPlugin)
+  .settings(
+    name := "bot_rocio",
+    libraryDependencies ++= testDeps
+  )
+  .dependsOn(
+    library
+  )
+
 lazy val bot_boda = project
   .in(file("src/bot_boda"))
   .enablePlugins(PackagingTypePlugin)
@@ -129,6 +141,7 @@ lazy val bot_apps = project
     , bot_codigosecreto
     , bot_webchecker
     , bot_boda
+    , bot_rocio
   )
 
 val telegramBotVersion = "4.0.0-RC2"

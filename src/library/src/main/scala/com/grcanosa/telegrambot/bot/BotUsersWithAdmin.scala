@@ -1,5 +1,7 @@
 package com.grcanosa.telegrambot.bot
 
+import akka.actor.Actor
+
 import scala.concurrent.duration._
 import com.bot4s.telegram.api.AkkaDefaults
 import com.bot4s.telegram.api.declarative.Action
@@ -45,6 +47,13 @@ with LazyBotLogging{
     }
   }
 
+  def allUsers(interaction: Option[String])(action: Action[UserHandler])(implicit msg: Message) = {
+    addInteraction(interaction)
+    val user = userFromMessage(msg)
+    val userH = getUser(user)
+    action(userH)
+  }
+
   def isUserAdmin(userId: Long) = userId == adminId
 
   val noAction = (_: Any) => ()
@@ -74,5 +83,8 @@ with LazyBotLogging{
   def userFromMessage(msg: Message) = {
     msg.from.get
   }
+
+
+
 
 }

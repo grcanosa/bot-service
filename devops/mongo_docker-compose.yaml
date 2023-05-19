@@ -7,7 +7,8 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - "/mnt/DATA/BOTDATA/mongodb/:/data/db/"
+    #  - "/mnt/DATA/BOTDATA/mongodb/:/data/db/"
+      - "/tmp/mongodb:/data/db"
 
   mongo-express:
     image: mongo-express
