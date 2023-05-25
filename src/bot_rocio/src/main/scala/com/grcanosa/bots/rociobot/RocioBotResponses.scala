@@ -181,4 +181,8 @@ trait RocioBotResponses {
 
  )
 
+  def finalPointsResponse(points: Int): String = {
+    s"Estupendo, tu puntuación final es de $points puntos!!".emojize
+  }
+
 }

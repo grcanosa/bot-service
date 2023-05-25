@@ -145,6 +145,7 @@ lazy val bot_apps = project
   )
 
 val telegramBotVersion = "4.0.0-RC2"
+//val telegramBotVersion = "5.6.3"
 val seleniumVersion = "3.141.59"
 //val akkaVersion = "2.5.30"
 val akkaVersion = "2.6.8"

@@ -84,6 +84,7 @@ extends BotWithAdmin(token, adminId)
 
 
   class RocioBotUserActor(botUser: BotUser) extends Actor with Timers{
+    botlog.info(s"Creating actor for user ${botUser.id} ${botUser.name}")
 
     var currentQuestionIndex = -1
     var currentPointsIdx = 0
@@ -92,6 +93,7 @@ extends BotWithAdmin(token, adminId)
     self ! StartupText
 
     def respondQuestionMessage(msg: Message) = {
+      botlog.info(s"Responding message ${msg.text} from user ${botUser.name}")
       val q = getQuestionIdx(currentQuestionIndex)
       q.foreach{ question =>
         if (msg.text.isDefined && answers.exists(_ == msg.text.get)) {
@@ -115,14 +117,15 @@ extends BotWithAdmin(token, adminId)
     }
 
     def sendNewQuestion() = {
+      botlog.info(s"Sending new question to ${botUser.id}- ${botUser.name}")
       currentQuestionIndex += 1
       currentPointsIdx = 0
       val q = getQuestionIdx(currentQuestionIndex)
       q match {
         case Some(question) => botActor ! SendMessage(botUser.id,question.questionMsg(currentQuestionIndex+1),replyMarkup = Some(answersKeyboard))
         case None => {
-          botActor ! SendMessage(botUser.id,s"Points: ${totalPoints}",replyMarkup = Some(removeKeyboard))
-          botActor ! SendMessage(botUser.id, "No more questions",replyMarkup = Some(removeKeyboard))
+          botActor ! SendMessage(botUser.id,finalPointsResponse(totalPoints),replyMarkup = Some(removeKeyboard))
+          //botActor ! SendMessage(botUser.id, "No more questions",replyMarkup = Some(removeKeyboard))
           context.become(notQuizzBehaviour)
         }
       }
@@ -152,6 +155,7 @@ extends BotWithAdmin(token, adminId)
   }
 
   override def createNewUserActor(botUser: BotUser): ActorRef = {
+    botlog.info(s"Creating actor ${botUser.id}-${botUser.name}")
     system.actorOf(Props(new RocioBotUserActor(botUser)), s"actor_${botUser.id}")
   }
 
