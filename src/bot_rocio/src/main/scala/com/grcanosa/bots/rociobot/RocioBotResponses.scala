@@ -44,7 +44,7 @@ trait RocioBotResponses {
       |Acierto a la tercera =>  3 puntos.
       |Acierto a la cuarta =>  1 punto.
       |
-      | Los 5 primeros que vayan a la organizadora con una puntuación de 100 puntos tendrán un pequeño regalo de conmemoración!
+      | Los 5 primeros que vayan a la organizadora con una puntuación de 100 puntos o más tendrán un pequeño regalo de conmemoración!
       |""".stripMargin.emojize
 
 
